@@ -1,0 +1,21 @@
+customer_id,customer_name,email,phone,registration_date,country,age,purchase_amount,product_category,payment_method
+1,John Doe,john.doe@email.com,123-456-7890,2023-01-15,USA,28.0,250.75,Electronics,Credit Card
+2,jane smith,JANE.SMITH@email.com,(123)4567890,15/02/2023,usa,34.0,340.0,electronics,credit card
+3,Alice Brown,alice@email.com,1234567890,2023.03.01,United States,45.0,120.5,Clothing,PayPal
+4,Bob Lee,bob.lee@email,,2022-12-30,Canada,-5.0,0.0,Home,Debit
+5,Maria Garcia,maria.garcia@email.com,+34 600 123 456,2023/04/10,Spain,39.0,-50.0,Beauty,Cash
+6,Li Wei,,+86 13800138000,2023-05-20,China,30.0,560.99,Electronics,Credit Card
+7,Omar Khan,omar.khan@email.com,+92-300-1234567,"May 25, 2023",Pakistan,,300.0,Sports,Bank Transfer
+8,Anne-Marie,annemarie@email.com,0044 7700 900123,2023-06-01,UK,25.0,75.25,clothing,Paypal
+9,Chris O'Neil,chris.oneil@email.com,123.456.7890,2023-06-15,USA,40.0,9999.0,Electronics,CREDIT CARD
+10,   Sarah Connor  ,sarah.connor@email.com, 1234567890 ,,U.S.A,38.0,,,
+11,David Miller,david.miller@email.com,987-654-3210,2023-07-01,USA,120.0,450.0,Home,Debit Card
+12,Priya Patel,priya.patel@email.com,91-9876543210,01-08-2023,India,29.0,220.75,Beauty,UPI
+13,Ahmed Ali,ahmed.ali@email.com,,2023/08/15,UAE,33.0,180.0,Electronics,Cash
+14,Sofia Rossi,sofia.rossi@email.com,+39 333 1234567,"September 1, 2023",Italy,41.0,310.4,Clothing,Credit Card
+15,Lucas Martin,lucas.martin@email.com,+33 612345678,2023-09-10,France,27.0,95.99,Sports,Debit
+16,Emily Clark,emily.clark@email.com,,2023.10.01,USA,35.0,410.0,Home,Credit Card
+17,Daniel Kim,daniel.kim@email.com,+82 10-1234-5678,2023-10-15,South Korea,31.0,275.6,Electronics,Bank Transfer
+18,Fatima Noor,fatima.noor@email.com,+971 50 123 4567,15/11/2023,UAE,,600.0,Beauty,Cash
+19,Carlos Diaz,carlos.diaz@email.com,52-5512345678,2023-11-20,Mexico,44.0,-20.0,Sports,
+20,,invalid_email,,2023-12-01,USA,22.0,150.0,Clothing,PayPal

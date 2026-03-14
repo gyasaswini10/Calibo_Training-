@@ -1,0 +1,469 @@
+open ubuntu app and run sudo mysql password it open sql shell
+open ubuntu app and run sudo mysql password it open sql shell
+Tables_in_basicsqltable
+employees
+orders
+products
+exercise 1.1
+exercise 1.1
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+1	John	Sharma	john@company.com	IT	Dev	90000	2020-01-10	NULL	San Francisco
+2	James	Johnson	james@company.com	IT	Dev	95000	2019-02-12	1	San Francisco
+3	Jack	Singh	jack@company.com	IT	Lead	92000	2019-03-15	1	San Francisco
+4	Julia	Thomas	julia@company.com	IT	Tester	72000	2019-04-18	1	New York
+5	Nea	Gupta	neha@company.com	IT	Tester	72000	2019-05-20	1	Chicago
+6	Rohit	Wilson	rohit@company.com	Sales	Exec	60000	2019-06-10	NULL	Boston
+7	Pooja	Mehta	pooja@company.com	Sales	Mgr	85000	2019-07-12	6	Delhi
+8	Suresh	Rao	suresh@company.com	Sales	Exec	55000	2020-08-12	6	New York
+9	Kiran	Das	kiran@company.com	Marketing	Mgr	74000	2020-09-15	NULL	Boston
+10	Ritika	Nair	ritu@company.com	Marketing	Exec	60000	2020-10-18	9	Chicago
+11	Manoj	Iyer	manoj@company.com	HR	Mgr	58000	2020-11-20	1	Boston
+12	Sneha	Anderson	sneha@company.com	HR	Exec	52000	2021-01-05	11	Delhi
+13	Vikas	Jain	vikas@company.com	Finance	Acc	61000	2021-02-10	1	Chicago
+14	Arun	Malik	tarun@company.com	Finance	Acc	60000	2021-03-12	13	Boston
+15	Anita	Roy	anita@company.com	Finance	Rep	48000	2021-04-15	1	New York
+
+exercise 1.2
+first_name	last_name	email
+John	Sharma	john@company.com
+James	Johnson	james@company.com
+Jack	Singh	jack@company.com
+Julia	Thomas	julia@company.com
+Nea	Gupta	neha@company.com
+Rohit	Wilson	rohit@company.com
+Pooja	Mehta	pooja@company.com
+Suresh	Rao	suresh@company.com
+Kiran	Das	kiran@company.com
+Ritika	Nair	ritu@company.com
+Manoj	Iyer	manoj@company.com
+Sneha	Anderson	sneha@company.com
+Vikas	Jain	vikas@company.com
+Arun	Malik	tarun@company.com
+Anita	Roy	anita@company.com
+
+exercise 1.3
+First Name	Last Name	Annual Salary
+John	Sharma	90000
+James	Johnson	95000
+Jack	Singh	92000
+Julia	Thomas	72000
+Nea	Gupta	72000
+Rohit	Wilson	60000
+Pooja	Mehta	85000
+Suresh	Rao	55000
+Kiran	Das	74000
+Ritika	Nair	60000
+Manoj	Iyer	58000
+Sneha	Anderson	52000
+Vikas	Jain	61000
+Arun	Malik	60000
+Anita	Roy	48000
+
+exercise 1.4
+department
+IT
+Sales
+Marketing
+HR
+Finance
+
+exercise 1.5
+department	city
+IT	San Francisco
+IT	New York
+IT	Chicago
+Sales	Boston
+Sales	Delhi
+Sales	New York
+Marketing	Boston
+Marketing	Chicago
+HR	Boston
+HR	Delhi
+Finance	Chicago
+Finance	Boston
+Finance	New York
+
+Exercise 2.1: monthly salary
+first_name	last_name	salary	monthly_salary
+John	Sharma	90000	7500.0000
+James	Johnson	95000	7916.6667
+Jack	Singh	92000	7666.6667
+Julia	Thomas	72000	6000.0000
+Nea	Gupta	72000	6000.0000
+Rohit	Wilson	60000	5000.0000
+Pooja	Mehta	85000	7083.3333
+Suresh	Rao	55000	4583.3333
+Kiran	Das	74000	6166.6667
+Ritika	Nair	60000	5000.0000
+Manoj	Iyer	58000	4833.3333
+Sneha	Anderson	52000	4333.3333
+Vikas	Jain	61000	5083.3333
+Arun	Malik	60000	5000.0000
+Anita	Roy	48000	4000.0000
+
+Exercise 2.2:
+first_name	last_name	salary	monthly_salary	weekly_salary
+John	Sharma	90000	7500.0000	1730.7692
+James	Johnson	95000	7916.6667	1826.9231
+Jack	Singh	92000	7666.6667	1769.2308
+Julia	Thomas	72000	6000.0000	1384.6154
+Nea	Gupta	72000	6000.0000	1384.6154
+Rohit	Wilson	60000	5000.0000	1153.8462
+Pooja	Mehta	85000	7083.3333	1634.6154
+Suresh	Rao	55000	4583.3333	1057.6923
+Kiran	Das	74000	6166.6667	1423.0769
+Ritika	Nair	60000	5000.0000	1153.8462
+Manoj	Iyer	58000	4833.3333	1115.3846
+Sneha	Anderson	52000	4333.3333	1000.0000
+Vikas	Jain	61000	5083.3333	1173.0769
+Arun	Malik	60000	5000.0000	1153.8462
+Anita	Roy	48000	4000.0000	923.0769
+
+Exercise 2.3:
+full_name
+John Sharma
+James Johnson
+Jack Singh
+Julia Thomas
+Nea Gupta
+Rohit Wilson
+Pooja Mehta
+Suresh Rao
+Kiran Das
+Ritika Nair
+Manoj Iyer
+Sneha Anderson
+Vikas Jain
+Arun Malik
+Anita Roy
+
+Exercise 3.1:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+1	John	Sharma	john@company.com	IT	Dev	90000	2020-01-10	NULL	San Francisco
+2	James	Johnson	james@company.com	IT	Dev	95000	2019-02-12	1	San Francisco
+3	Jack	Singh	jack@company.com	IT	Lead	92000	2019-03-15	1	San Francisco
+4	Julia	Thomas	julia@company.com	IT	Tester	72000	2019-04-18	1	New York
+5	Nea	Gupta	neha@company.com	IT	Tester	72000	2019-05-20	1	Chicago
+
+Exercise 3.2:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+1	John	Sharma	john@company.com	IT	Dev	90000	2020-01-10	NULL	San Francisco
+2	James	Johnson	james@company.com	IT	Dev	95000	2019-02-12	1	San Francisco
+3	Jack	Singh	jack@company.com	IT	Lead	92000	2019-03-15	1	San Francisco
+4	Julia	Thomas	julia@company.com	IT	Tester	72000	2019-04-18	1	New York
+5	Nea	Gupta	neha@company.com	IT	Tester	72000	2019-05-20	1	Chicago
+7	Pooja	Mehta	pooja@company.com	Sales	Mgr	85000	2019-07-12	6	Delhi
+9	Kiran	Das	kiran@company.com	Marketing	Mgr	74000	2020-09-15	NULL	Boston
+
+Exercise 3.3:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+1	John	Sharma	john@company.com	IT	Dev	90000	2020-01-10	NULL	San Francisco
+2	James	Johnson	james@company.com	IT	Dev	95000	2019-02-12	1	San Francisco
+3	Jack	Singh	jack@company.com	IT	Lead	92000	2019-03-15	1	San Francisco
+4	Julia	Thomas	julia@company.com	IT	Tester	72000	2019-04-18	1	New York
+5	Nea	Gupta	neha@company.com	IT	Tester	72000	2019-05-20	1	Chicago
+9	Kiran	Das	kiran@company.com	Marketing	Mgr	74000	2020-09-15	NULL	Boston
+10	Ritika	Nair	ritu@company.com	Marketing	Exec	60000	2020-10-18	9	Chicago
+11	Manoj	Iyer	manoj@company.com	HR	Mgr	58000	2020-11-20	1	Boston
+12	Sneha	Anderson	sneha@company.com	HR	Exec	52000	2021-01-05	11	Delhi
+13	Vikas	Jain	vikas@company.com	Finance	Acc	61000	2021-02-10	1	Chicago
+14	Arun	Malik	tarun@company.com	Finance	Acc	60000	2021-03-12	13	Boston
+15	Anita	Roy	anita@company.com	Finance	Rep	48000	2021-04-15	1	New York
+
+Exercise 3.4:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+6	Rohit	Wilson	rohit@company.com	Sales	Exec	60000	2019-06-10	NULL	Boston
+8	Suresh	Rao	suresh@company.com	Sales	Exec	55000	2020-08-12	6	New York
+10	Ritika	Nair	ritu@company.com	Marketing	Exec	60000	2020-10-18	9	Chicago
+11	Manoj	Iyer	manoj@company.com	HR	Mgr	58000	2020-11-20	1	Boston
+12	Sneha	Anderson	sneha@company.com	HR	Exec	52000	2021-01-05	11	Delhi
+14	Arun	Malik	tarun@company.com	Finance	Acc	60000	2021-03-12	13	Boston
+15	Anita	Roy	anita@company.com	Finance	Rep	48000	2021-04-15	1	New York
+
+Exercise 4.1:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+1	John	Sharma	john@company.com	IT	Dev	90000	2020-01-10	NULL	San Francisco
+2	James	Johnson	james@company.com	IT	Dev	95000	2019-02-12	1	San Francisco
+3	Jack	Singh	jack@company.com	IT	Lead	92000	2019-03-15	1	San Francisco
+
+Exercise 4.2:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+6	Rohit	Wilson	rohit@company.com	Sales	Exec	60000	2019-06-10	NULL	Boston
+7	Pooja	Mehta	pooja@company.com	Sales	Mgr	85000	2019-07-12	6	Delhi
+8	Suresh	Rao	suresh@company.com	Sales	Exec	55000	2020-08-12	6	New York
+9	Kiran	Das	kiran@company.com	Marketing	Mgr	74000	2020-09-15	NULL	Boston
+10	Ritika	Nair	ritu@company.com	Marketing	Exec	60000	2020-10-18	9	Chicago
+
+Exercise 4.3:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+7	Pooja	Mehta	pooja@company.com	Sales	Mgr	85000	2019-07-12	6	Delhi
+9	Kiran	Das	kiran@company.com	Marketing	Mgr	74000	2020-09-15	NULL	Boston
+
+Exercise 4.4:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+6	Rohit	Wilson	rohit@company.com	Sales	Exec	60000	2019-06-10	NULL	Boston
+7	Pooja	Mehta	pooja@company.com	Sales	Mgr	85000	2019-07-12	6	Delhi
+8	Suresh	Rao	suresh@company.com	Sales	Exec	55000	2020-08-12	6	New York
+9	Kiran	Das	kiran@company.com	Marketing	Mgr	74000	2020-09-15	NULL	Boston
+10	Ritika	Nair	ritu@company.com	Marketing	Exec	60000	2020-10-18	9	Chicago
+13	Vikas	Jain	vikas@company.com	Finance	Acc	61000	2021-02-10	1	Chicago
+14	Arun	Malik	tarun@company.com	Finance	Acc	60000	2021-03-12	13	Boston
+15	Anita	Roy	anita@company.com	Finance	Rep	48000	2021-04-15	1	New York
+
+Exercise 4.4:
+
+can also be wriiten as
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+6	Rohit	Wilson	rohit@company.com	Sales	Exec	60000	2019-06-10	NULL	Boston
+7	Pooja	Mehta	pooja@company.com	Sales	Mgr	85000	2019-07-12	6	Delhi
+8	Suresh	Rao	suresh@company.com	Sales	Exec	55000	2020-08-12	6	New York
+9	Kiran	Das	kiran@company.com	Marketing	Mgr	74000	2020-09-15	NULL	Boston
+10	Ritika	Nair	ritu@company.com	Marketing	Exec	60000	2020-10-18	9	Chicago
+13	Vikas	Jain	vikas@company.com	Finance	Acc	61000	2021-02-10	1	Chicago
+14	Arun	Malik	tarun@company.com	Finance	Acc	60000	2021-03-12	13	Boston
+15	Anita	Roy	anita@company.com	Finance	Rep	48000	2021-04-15	1	New York
+
+Exercise 5.1:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+4	Julia	Thomas	julia@company.com	IT	Tester	72000	2019-04-18	1	New York
+5	Nea	Gupta	neha@company.com	IT	Tester	72000	2019-05-20	1	Chicago
+6	Rohit	Wilson	rohit@company.com	Sales	Exec	60000	2019-06-10	NULL	Boston
+8	Suresh	Rao	suresh@company.com	Sales	Exec	55000	2020-08-12	6	New York
+9	Kiran	Das	kiran@company.com	Marketing	Mgr	74000	2020-09-15	NULL	Boston
+10	Ritika	Nair	ritu@company.com	Marketing	Exec	60000	2020-10-18	9	Chicago
+11	Manoj	Iyer	manoj@company.com	HR	Mgr	58000	2020-11-20	1	Boston
+13	Vikas	Jain	vikas@company.com	Finance	Acc	61000	2021-02-10	1	Chicago
+14	Arun	Malik	tarun@company.com	Finance	Acc	60000	2021-03-12	13	Boston
+
+Exercise 5.1:
+
+can also be written as
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+4	Julia	Thomas	julia@company.com	IT	Tester	72000	2019-04-18	1	New York
+5	Nea	Gupta	neha@company.com	IT	Tester	72000	2019-05-20	1	Chicago
+6	Rohit	Wilson	rohit@company.com	Sales	Exec	60000	2019-06-10	NULL	Boston
+8	Suresh	Rao	suresh@company.com	Sales	Exec	55000	2020-08-12	6	New York
+9	Kiran	Das	kiran@company.com	Marketing	Mgr	74000	2020-09-15	NULL	Boston
+10	Ritika	Nair	ritu@company.com	Marketing	Exec	60000	2020-10-18	9	Chicago
+11	Manoj	Iyer	manoj@company.com	HR	Mgr	58000	2020-11-20	1	Boston
+13	Vikas	Jain	vikas@company.com	Finance	Acc	61000	2021-02-10	1	Chicago
+14	Arun	Malik	tarun@company.com	Finance	Acc	60000	2021-03-12	13	Boston
+
+Exercise 5.2:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+4	Julia	Thomas	julia@company.com	IT	Tester	72000	2019-04-18	1	New York
+5	Nea	Gupta	neha@company.com	IT	Tester	72000	2019-05-20	1	Chicago
+6	Rohit	Wilson	rohit@company.com	Sales	Exec	60000	2019-06-10	NULL	Boston
+8	Suresh	Rao	suresh@company.com	Sales	Exec	55000	2020-08-12	6	New York
+9	Kiran	Das	kiran@company.com	Marketing	Mgr	74000	2020-09-15	NULL	Boston
+10	Ritika	Nair	ritu@company.com	Marketing	Exec	60000	2020-10-18	9	Chicago
+11	Manoj	Iyer	manoj@company.com	HR	Mgr	58000	2020-11-20	1	Boston
+13	Vikas	Jain	vikas@company.com	Finance	Acc	61000	2021-02-10	1	Chicago
+14	Arun	Malik	tarun@company.com	Finance	Acc	60000	2021-03-12	13	Boston
+15	Anita	Roy	anita@company.com	Finance	Rep	48000	2021-04-15	1	New York
+
+Exercise 5.3:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+1	John	Sharma	john@company.com	IT	Dev	90000	2020-01-10	NULL	San Francisco
+2	James	Johnson	james@company.com	IT	Dev	95000	2019-02-12	1	San Francisco
+3	Jack	Singh	jack@company.com	IT	Lead	92000	2019-03-15	1	San Francisco
+4	Julia	Thomas	julia@company.com	IT	Tester	72000	2019-04-18	1	New York
+
+Exercise 5.4:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+2	James	Johnson	james@company.com	IT	Dev	95000	2019-02-12	1	San Francisco
+6	Rohit	Wilson	rohit@company.com	Sales	Exec	60000	2019-06-10	NULL	Boston
+12	Sneha	Anderson	sneha@company.com	HR	Exec	52000	2021-01-05	11	Delhi
+
+Exercise 5.5:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+1	John	Sharma	john@company.com	IT	Dev	90000	2020-01-10	NULL	San Francisco
+3	Jack	Singh	jack@company.com	IT	Lead	92000	2019-03-15	1	San Francisco
+14	Arun	Malik	tarun@company.com	Finance	Acc	60000	2021-03-12	13	Boston
+
+Exercise 5.6:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+1	John	Sharma	john@company.com	IT	Dev	90000	2020-01-10	NULL	San Francisco
+6	Rohit	Wilson	rohit@company.com	Sales	Exec	60000	2019-06-10	NULL	Boston
+9	Kiran	Das	kiran@company.com	Marketing	Mgr	74000	2020-09-15	NULL	Boston
+
+Exercise 5.7:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+2	James	Johnson	james@company.com	IT	Dev	95000	2019-02-12	1	San Francisco
+3	Jack	Singh	jack@company.com	IT	Lead	92000	2019-03-15	1	San Francisco
+4	Julia	Thomas	julia@company.com	IT	Tester	72000	2019-04-18	1	New York
+5	Nea	Gupta	neha@company.com	IT	Tester	72000	2019-05-20	1	Chicago
+7	Pooja	Mehta	pooja@company.com	Sales	Mgr	85000	2019-07-12	6	Delhi
+8	Suresh	Rao	suresh@company.com	Sales	Exec	55000	2020-08-12	6	New York
+10	Ritika	Nair	ritu@company.com	Marketing	Exec	60000	2020-10-18	9	Chicago
+11	Manoj	Iyer	manoj@company.com	HR	Mgr	58000	2020-11-20	1	Boston
+12	Sneha	Anderson	sneha@company.com	HR	Exec	52000	2021-01-05	11	Delhi
+13	Vikas	Jain	vikas@company.com	Finance	Acc	61000	2021-02-10	1	Chicago
+14	Arun	Malik	tarun@company.com	Finance	Acc	60000	2021-03-12	13	Boston
+15	Anita	Roy	anita@company.com	Finance	Rep	48000	2021-04-15	1	New York
+
+Exercise 6.1:
+product_id	product_name	category	price	stock_quantity	supplier
+2	Headphones	Electronics	850.00	40	TechCorp
+3	Keyboard	Electronics	650.00	30	CableWorks
+4	Mouse	Electronics	80.00	35	CableWorks
+6	Mobile Cover	Accessories	250.00	45	TechCorp
+7	Charger	Electronics	90.00	30	TechCorp
+8	Power Bank	Electronics	1500.00	40	PowerHub
+9	Pen Drive	Electronics	600.00	20	TechCorp
+11	Pen	Stationery	20.00	0	PaperMart
+14	Calculator	Electronics	900.00	10	TechCorp
+15	School Bag	Accessories	1800.00	22	BagWorld
+
+Exercise 6.2:
+product_id	product_name	category	price	stock_quantity	supplier
+11	Pen	Stationery	20.00	0	PaperMart
+
+Exercise 6.3:
+product_id	product_name	category	price	stock_quantity	supplier
+4	Mouse	Electronics	80.00	35	CableWorks
+7	Charger	Electronics	90.00	30	TechCorp
+10	Notebook	Stationery	60.00	200	PaperMart
+11	Pen	Stationery	20.00	0	PaperMart
+
+can also be written as
+product_id	product_name	category	price	stock_quantity	supplier
+4	Mouse	Electronics	80.00	35	CableWorks
+7	Charger	Electronics	90.00	30	TechCorp
+10	Notebook	Stationery	60.00	200	PaperMart
+11	Pen	Stationery	20.00	0	PaperMart
+
+Exercise 6.4:
+product_id	product_name	category	price	stock_quantity	supplier
+1	USB Cable	Electronics	150.00	120	TechCorp
+2	Headphones	Electronics	850.00	40	TechCorp
+3	Keyboard	Electronics	650.00	30	CableWorks
+4	Mouse	Electronics	80.00	35	CableWorks
+5	Laptop Bag	Accessories	1200.00	60	BagWorld
+6	Mobile Cover	Accessories	250.00	45	TechCorp
+7	Charger	Electronics	90.00	30	TechCorp
+8	Power Bank	Electronics	1500.00	40	PowerHub
+9	Pen Drive	Electronics	600.00	20	TechCorp
+12	Water Bottle	Accessories	300.00	70	BottleCo
+13	Earphones	Electronics	450.00	80	CableWorks
+14	Calculator	Electronics	900.00	10	TechCorp
+15	School Bag	Accessories	1800.00	22	BagWorld
+
+Exercise 6.5:
+product_id	product_name	category	price	stock_quantity	supplier
+1	USB Cable	Electronics	150.00	120	TechCorp
+2	Headphones	Electronics	850.00	40	TechCorp
+6	Mobile Cover	Accessories	250.00	45	TechCorp
+7	Charger	Electronics	90.00	30	TechCorp
+9	Pen Drive	Electronics	600.00	20	TechCorp
+14	Calculator	Electronics	900.00	10	TechCorp
+
+Exercise 7.1:
+order_id	customer_name	product_id	quantity	order_date	total_amount	status
+1	Amit	1	3	2024-03-05	300.00	Processing
+2	Bina	2	2	2024-03-10	250.00	Shipped
+3	Chetan	3	2	2024-03-15	220.00	Delivered
+4	Divya	4	1	2024-03-20	210.00	Processing
+
+Exercise 7.2:
+order_id	customer_name	product_id	quantity	order_date	total_amount	status
+1	Amit	1	3	2024-03-05	300.00	Processing
+2	Bina	2	2	2024-03-10	250.00	Shipped
+3	Chetan	3	2	2024-03-15	220.00	Delivered
+4	Divya	4	1	2024-03-20	210.00	Processing
+5	Esha	5	2	2024-02-12	260.00	Delivered
+6	Farhan	6	1	2024-02-25	230.00	Pending
+7	Gopal	7	2	2024-04-02	240.00	Shipped
+8	Harish	8	1	2024-01-18	260.00	Pending
+
+Exercise 7.3:
+order_id	customer_name	product_id	quantity	order_date	total_amount	status
+1	Amit	1	3	2024-03-05	300.00	Processing
+2	Bina	2	2	2024-03-10	250.00	Shipped
+4	Divya	4	1	2024-03-20	210.00	Processing
+7	Gopal	7	2	2024-04-02	240.00	Shipped
+
+Exercise 7.4:
+order_id	customer_name	product_id	quantity	order_date	total_amount	status
+10	Jay	10	1	2024-04-05	100.00	Cancelled
+
+Exercise 8.1:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+1	John	Sharma	john@company.com	IT	Dev	90000	2020-01-10	NULL	San Francisco
+2	James	Johnson	james@company.com	IT	Dev	95000	2019-02-12	1	San Francisco
+3	Jack	Singh	jack@company.com	IT	Lead	92000	2019-03-15	1	San Francisco
+
+Exercise 8.2:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+1	John	Sharma	john@company.com	IT	Dev	90000	2020-01-10	NULL	San Francisco
+8	Suresh	Rao	suresh@company.com	Sales	Exec	55000	2020-08-12	6	New York
+9	Kiran	Das	kiran@company.com	Marketing	Mgr	74000	2020-09-15	NULL	Boston
+10	Ritika	Nair	ritu@company.com	Marketing	Exec	60000	2020-10-18	9	Chicago
+11	Manoj	Iyer	manoj@company.com	HR	Mgr	58000	2020-11-20	1	Boston
+12	Sneha	Anderson	sneha@company.com	HR	Exec	52000	2021-01-05	11	Delhi
+13	Vikas	Jain	vikas@company.com	Finance	Acc	61000	2021-02-10	1	Chicago
+14	Arun	Malik	tarun@company.com	Finance	Acc	60000	2021-03-12	13	Boston
+15	Anita	Roy	anita@company.com	Finance	Rep	48000	2021-04-15	1	New York
+
+Exercise 8.3:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+1	John	Sharma	john@company.com	IT	Dev	90000	2020-01-10	NULL	San Francisco
+2	James	Johnson	james@company.com	IT	Dev	95000	2019-02-12	1	San Francisco
+3	Jack	Singh	jack@company.com	IT	Lead	92000	2019-03-15	1	San Francisco
+4	Julia	Thomas	julia@company.com	IT	Tester	72000	2019-04-18	1	New York
+5	Nea	Gupta	neha@company.com	IT	Tester	72000	2019-05-20	1	Chicago
+6	Rohit	Wilson	rohit@company.com	Sales	Exec	60000	2019-06-10	NULL	Boston
+7	Pooja	Mehta	pooja@company.com	Sales	Mgr	85000	2019-07-12	6	Delhi
+8	Suresh	Rao	suresh@company.com	Sales	Exec	55000	2020-08-12	6	New York
+9	Kiran	Das	kiran@company.com	Marketing	Mgr	74000	2020-09-15	NULL	Boston
+10	Ritika	Nair	ritu@company.com	Marketing	Exec	60000	2020-10-18	9	Chicago
+11	Manoj	Iyer	manoj@company.com	HR	Mgr	58000	2020-11-20	1	Boston
+12	Sneha	Anderson	sneha@company.com	HR	Exec	52000	2021-01-05	11	Delhi
+13	Vikas	Jain	vikas@company.com	Finance	Acc	61000	2021-02-10	1	Chicago
+14	Arun	Malik	tarun@company.com	Finance	Acc	60000	2021-03-12	13	Boston
+15	Anita	Roy	anita@company.com	Finance	Rep	48000	2021-04-15	1	New York
+
+Exercise 8.4:
+product_id	product_name	category	price	stock_quantity	supplier
+9	Pen Drive	Electronics	600.00	20	TechCorp
+14	Calculator	Electronics	900.00	10	TechCorp
+
+Exercise 8.5:
+order_id	customer_name	product_id	quantity	order_date	total_amount	status
+3	Chetan	3	2	2024-03-15	220.00	Delivered
+5	Esha	5	2	2024-02-12	260.00	Delivered
+
+Challenge 9.1:
+first_name	last_name	salary	level
+Rohit	Wilson	60000	Entry Level
+Suresh	Rao	55000	Entry Level
+Ritika	Nair	60000	Entry Level
+Manoj	Iyer	58000	Entry Level
+Sneha	Anderson	52000	Entry Level
+Arun	Malik	60000	Entry Level
+
+Challenge 9.2:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+4	Julia	Thomas	julia@company.com	IT	Tester	72000	2019-04-18	1	New York
+6	Rohit	Wilson	rohit@company.com	Sales	Exec	60000	2019-06-10	NULL	Boston
+14	Arun	Malik	tarun@company.com	Finance	Acc	60000	2021-03-12	13	Boston
+
+Challenge 9.3:
+product_id	product_name	category	price	stock_quantity	supplier
+4	Mouse	Electronics	80.00	35	CableWorks
+7	Charger	Electronics	90.00	30	TechCorp
+
+Challenge 9.4:
+employee_id	first_name	last_name	email	department	job_title	salary	hire_date	manager_id	city
+6	Rohit	Wilson	rohit@company.com	Sales	Exec	60000	2019-06-10	NULL	Boston
+9	Kiran	Das	kiran@company.com	Marketing	Mgr	74000	2020-09-15	NULL	Boston
+10	Ritika	Nair	ritu@company.com	Marketing	Exec	60000	2020-10-18	9	Chicago
+11	Manoj	Iyer	manoj@company.com	HR	Mgr	58000	2020-11-20	1	Boston
+
+Challenge 9.5:
+order_id	customer_name	product_id	quantity	order_date	total_amount	status
+1	Amit	1	3	2024-03-05	300.00	Processing
+2	Bina	2	2	2024-03-10	250.00	Shipped
+3	Chetan	3	2	2024-03-15	220.00	Delivered
+5	Esha	5	2	2024-02-12	260.00	Delivered
+7	Gopal	7	2	2024-04-02	240.00	Shipped

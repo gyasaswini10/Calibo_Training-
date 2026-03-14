@@ -1,0 +1,231 @@
+
+exercise 1
+emp_no	first_name	last_name
+109084	Jiang	Vesel
+emp_no	first_name	last_name
+10003	Parto	Bamford
+10004	Chirstian	Koblick
+10010	Duangkaew	Piveteau
+10018	Kazuhide	Peha
+10020	Mayuko	Warwick
+10024	Suzette	Pettey
+10026	Yongqiao	Berztiss
+10029	Otmar	Herbst
+10030	Elvis	Demeyer
+10032	Jeong	Reistad
+
+exercise 3
+emp_no	first_name	last_name
+61036	Shimshon	Nergos
+
+exercise 4
+YEAR(hire_date)	COUNT(*)
+1986	36150
+1985	35316
+1989	28394
+1994	14835
+1990	25610
+1992	20402
+1987	33501
+1995	12115
+1993	17772
+1999	1514
+1991	22568
+1988	31436
+1997	6669
+1996	9574
+1998	4155
+2000	13
+
+exercise 5
+YEAR(hire_date)
+1986
+
+exercise 6
+dept_name	YEAR(s.from_date)	SUM(s.salary)
+Customer Service	1985	14028544
+Customer Service	1986	30188533
+Customer Service	1987	49319328
+Customer Service	1988	69395719
+Customer Service	1989	90915681
+Customer Service	1990	113107088
+Customer Service	1991	137862336
+Customer Service	1992	161591254
+Customer Service	1993	184672308
+Customer Service	1994	211415522
+Customer Service	1995	236059838
+Customer Service	1996	265249749
+Customer Service	1997	296907893
+Customer Service	1998	329938615
+Customer Service	1999	360151483
+Customer Service	2000	380563338
+Customer Service	2001	392398418
+Customer Service	2002	235090872
+Development	1985	84118754
+Development	1986	175911861
+Development	1987	273071144
+Development	1988	372003463
+Development	1989	473113555
+Development	1990	574468021
+Development	1991	673076639
+Development	1992	779909487
+Development	1993	884298105
+Development	1994	981200640
+Development	1995	1080419493
+Development	1996	1182811646
+Development	1997	1275423554
+Development	1998	1366568615
+Development	1999	1452235132
+Development	2000	1459243006
+Development	2001	1446737735
+Development	2002	843321229
+Finance	1985	21622085
+Finance	1986	42998315
+Finance	1987	66438113
+Finance	1988	89690086
+Finance	1989	114806341
+Finance	1990	139528185
+Finance	1991	163596768
+Finance	1992	188104589
+Finance	1993	210896751
+Finance	1994	233592762
+Finance	1995	255978760
+Finance	1996	279855640
+Finance	1997	302051985
+Finance	1998	322122275
+Finance	1999	341597126
+Finance	2000	341668348
+Finance	2001	337557530
+Finance	2002	197193100
+Human Resources	1985	15302609
+Human Resources	1986	32807181
+Human Resources	1987	51116723
+Human Resources	1988	69185077
+Human Resources	1989	88213858
+Human Resources	1990	106214753
+Human Resources	1991	125721921
+Human Resources	1992	145868837
+Human Resources	1993	164866442
+Human Resources	1994	186984893
+Human Resources	1995	208680687
+Human Resources	1996	229145570
+Human Resources	1997	249986851
+Human Resources	1998	268385656
+Human Resources	1999	285147121
+Human Resources	2000	287356622
+Human Resources	2001	287298333
+Human Resources	2002	168437414
+Marketing	1985	22757027
+Marketing	1986	45923017
+Marketing	1987	66002182
+Marketing	1988	91343916
+Marketing	1989	115741004
+Marketing	1990	140863596
+Marketing	1991	167800225
+Marketing	1992	194337773
+Marketing	1993	220106274
+Marketing	1994	245682658
+Marketing	1995	271382395
+Marketing	1996	299236014
+Marketing	1997	328654004
+Marketing	1998	355829098
+Marketing	1999	384928346
+Marketing	2000	391955445
+Marketing	2001	395815454
+Marketing	2002	233067408
+Production	1985	66685045
+Production	1986	140025933
+Production	1987	215017001
+Production	1988	298371958
+Production	1989	379742540
+Production	1990	463864539
+Production	1991	545076219
+Production	1992	632610105
+Production	1993	720104601
+Production	1994	806817374
+Production	1995	893331623
+Production	1996	982815214
+Production	1997	1070352693
+Production	1998	1151407994
+Production	1999	1230556977
+Production	2000	1248855020
+Production	2001	1250822828
+Production	2002	733609942
+Quality Management	1985	15216191
+Quality Management	1986	31352162
+Quality Management	1987	51279452
+Quality Management	1988	71261487
+Quality Management	1989	90338626
+Quality Management	1990	109913590
+Quality Management	1991	132327399
+Quality Management	1992	154848612
+Quality Management	1993	177380395
+Quality Management	1994	199361525
+Quality Management	1995	221402964
+Quality Management	1996	244646706
+Quality Management	1997	265881609
+Quality Management	1998	290524989
+Quality Management	1999	312633407
+Quality Management	2000	318426405
+Quality Management	2001	322551895
+Quality Management	2002	187829175
+Research	1985	17108733
+Research	1986	37410037
+Research	1987	56515555
+Research	1988	78012145
+Research	1989	98509908
+Research	1990	120595840
+Research	1991	142843289
+Research	1992	167711321
+Research	1993	190280923
+Research	1994	212779271
+Research	1995	237071839
+Research	1996	263026493
+Research	1997	289271831
+Research	1998	312990201
+Research	1999	340138512
+Research	2000	347945406
+Research	2001	352978847
+Research	2002	214427595
+Sales	1985	73348649
+Sales	1986	156727773
+Sales	1987	235635511
+Sales	1988	316521272
+Sales	1989	396391285
+Sales	1990	481271965
+Sales	1991	560794501
+Sales	1992	650147318
+Sales	1993	731074537
+Sales	1994	811956188
+Sales	1995	892750769
+Sales	1996	973076732
+Sales	1997	1043903297
+Sales	1998	1118283874
+Sales	1999	1186801614
+Sales	2000	1181099695
+Sales	2001	1162739306
+Sales	2002	672962513
+
+exercise 7
+YEAR(hire_date)
+1986
+
+exercise 8
+hire_date
+1985-08-04
+
+exercise 9
+salary
+83457
+
+exercise 10
+first_name	emp_no
+Vishwani	110039
+Isamu	110114
+Karsten	110228
+Oscar	110420
+Leon	110567
+Dung	110854
+Hauke	111133
+Hilary	111534
+Yuchang	111939
