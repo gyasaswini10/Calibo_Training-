@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CI/CD for ML — Coding Lab</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&display=swap');
+:root{
+  --bg:#0b0f12;--surface:#111820;--panel:#161e28;--editor-bg:#0d1117;
+  --border:#1e2d3d;--border2:#253545;
+  --cyan:#58d0ff;--cyan2:#1a8fad;
+  --green:#3ddc84;--green2:#1a5c38;
+  --amber:#ffb347;--amber2:#7a5010;
+  --red:#ff5370;--red2:#4a1525;
+  --white:#eef2f5;--text:#8bafc0;--muted:#3a5060;
+  --mono:'JetBrains Mono',monospace;--display:'Bebas Neue',sans-serif;--body:'Barlow',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--body);height:100vh;overflow:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(88,208,255,.006) 3px,rgba(88,208,255,.006) 4px);pointer-events:none;z-index:9999}
+.app{display:grid;grid-template-rows:48px 1fr;height:100vh}
+/* titlebar */
+.titlebar{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0}
+.tb-left{display:flex;align-items:center;gap:12px}
+.tb-dots{display:flex;gap:6px}
+.tb-dot{width:12px;height:12px;border-radius:50%}
+.tb-dot.cl{background:#ff5f57}.tb-dot.mn{background:#febc2e}.tb-dot.mx{background:#28c840}
+.tb-title{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:1px}
+.tb-right{display:flex;align-items:center;gap:16px}
+.score-pill{font-family:var(--mono);font-size:11px;color:var(--amber);background:rgba(255,179,71,.08);border:1px solid rgba(255,179,71,.25);padding:3px 12px}
+.prog-pill{font-family:var(--mono);font-size:11px;color:var(--cyan)}
+/* layout */
+.main{display:grid;grid-template-columns:210px 1fr 290px;overflow:hidden;height:100%}
+/* sidebar */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.sb-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;padding:10px 12px 6px;border-bottom:1px solid var(--border)}
+.file-item{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-family:var(--mono);position:relative;transition:background .15s;border-left:2px solid transparent}
+.file-item:hover{background:rgba(88,208,255,.04)}
+.file-item.active{background:rgba(88,208,255,.08);color:var(--cyan);border-left-color:var(--cyan)}
+.file-item.locked{opacity:.3;pointer-events:none}
+.fi-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi-icon{font-size:13px;flex-shrink:0}
+.fi-badge{font-size:9px;padding:2px 5px;font-weight:700}
+.fi-badge.todo{background:rgba(255,179,71,.15);color:var(--amber)}
+.fi-badge.done{background:rgba(61,220,132,.15);color:var(--green)}
+.fi-badge.lock{background:rgba(255,255,255,.06);color:var(--muted)}
+.sb-section{border-bottom:1px solid var(--border);padding-bottom:4px}
+.sb-env{padding:10px 12px;margin-top:auto;border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.8}
+/* editor */
+.editor-area{display:flex;flex-direction:column;overflow:hidden;background:var(--editor-bg)}
+.ed-tabs{display:flex;align-items:center;background:var(--surface);border-bottom:1px solid var(--border);height:38px;flex-shrink:0}
+.ed-tab{display:flex;align-items:center;gap:8px;padding:0 16px;height:100%;font-family:var(--mono);font-size:12px;color:var(--muted);border-right:1px solid var(--border);white-space:nowrap}
+.ed-tab.active{background:var(--editor-bg);color:var(--white);border-bottom:2px solid var(--cyan)}
+.ed-wrap{display:flex;flex:1;overflow:hidden;min-height:0}
+.ln{background:var(--editor-bg);padding:14px 10px 14px 14px;font-family:var(--mono);font-size:13px;line-height:1.7;color:#3d5a6a;text-align:right;user-select:none;border-right:1px solid var(--border);flex-shrink:0;min-width:48px;white-space:pre;overflow:hidden}
+.code-area{flex:1;overflow:hidden;min-height:0}
+.code-editor{width:100%;height:100%;padding:14px 16px;font-family:var(--mono);font-size:13px;line-height:1.7;color:#c8e4f2;background:var(--editor-bg);border:none;outline:none;resize:none;overflow:auto;tab-size:4;white-space:pre;caret-color:#58d0ff;display:block;box-sizing:border-box}
+.code-editor:focus{outline:none;background:#0f1a22}
+.code-editor::selection{background:rgba(88,208,255,.22)}
+/* toolbar */
+.toolbar{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0}
+.tbtn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px;border:1px solid;transition:all .2s}
+.tbtn-run{background:rgba(61,220,132,.1);border-color:var(--green2);color:var(--green)}
+.tbtn-run:hover{background:rgba(61,220,132,.2);box-shadow:0 0 10px rgba(61,220,132,.2)}
+.tbtn-run:disabled{opacity:.3;cursor:not-allowed;box-shadow:none}
+.tbtn-val{background:rgba(88,208,255,.08);border-color:var(--cyan2);color:var(--cyan)}
+.tbtn-val:hover{background:rgba(88,208,255,.15)}
+.tbtn-hint{background:rgba(255,179,71,.06);border-color:var(--amber2);color:var(--amber)}
+.tbtn-hint:hover{background:rgba(255,179,71,.12)}
+.tbtn-rst{background:transparent;border-color:var(--border2);color:var(--muted);margin-left:auto}
+.tbtn-rst:hover{border-color:var(--red2);color:var(--red)}
+.sep{width:1px;height:20px;background:var(--border)}
+.statusbar{font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:auto}
+/* terminal */
+.terminal{flex-shrink:0;border-top:1px solid var(--border);background:#040b0e;display:flex;flex-direction:column;min-height:140px;max-height:200px}
+.term-hdr{display:flex;align-items:center;gap:8px;padding:4px 12px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;flex-shrink:0}
+.term-body{padding:8px 14px;font-family:var(--mono);font-size:12px;line-height:1.7;overflow-y:auto;flex:1}
+.tl{margin-bottom:1px}.tl.ti{color:#4a90a8}.tl.tok{color:var(--green)}.tl.terr{color:var(--red)}.tl.twarn{color:var(--amber)}.tl.tcmd{color:var(--cyan)}.tl.tdim{color:var(--muted)}
+.cur{display:inline-block;width:8px;height:13px;background:var(--cyan);vertical-align:middle;animation:blink .8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+/* right panel */
+.rpanel{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
+.rp-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.rp-tab{flex:1;padding:8px 4px;font-family:var(--mono);font-size:9px;text-align:center;cursor:pointer;letter-spacing:1px;text-transform:uppercase;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s}
+.rp-tab:hover{color:var(--text)}
+.rp-tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.rp-body{flex:1;overflow-y:auto;padding:14px}
+.rp-sec{display:none}.rp-sec.show{display:block}
+/* mission */
+.m-tag{font-family:var(--mono);font-size:9px;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.m-head{font-family:var(--display);font-size:26px;color:var(--white);letter-spacing:1px;line-height:1;margin-bottom:4px}
+.m-sub{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:10px}
+.m-desc{font-size:12px;line-height:1.7;color:var(--text);margin-bottom:12px}
+.m-desc strong{color:var(--white)}
+.obj-list{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.obj{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:var(--panel);border:1px solid var(--border);font-size:11px;line-height:1.5}
+.obj.done{border-color:rgba(61,220,132,.3);background:rgba(61,220,132,.04)}
+.obj-num{font-family:var(--mono);font-size:9px;color:var(--cyan);min-width:18px;flex-shrink:0}
+.obj-ck{width:14px;height:14px;border:1px solid var(--border2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--green)}
+.obj.done .obj-ck{background:rgba(61,220,132,.15);border-color:var(--green)}
+.pbar{height:3px;background:var(--border);border-radius:2px;margin-bottom:12px}
+.pfill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:2px;transition:width .5s}
+.pts-row{font-family:var(--mono);font-size:9px;color:var(--amber);text-align:right;margin-bottom:8px}
+.done-banner{background:rgba(61,220,132,.06);border:1px solid rgba(61,220,132,.3);padding:10px 12px;margin-bottom:10px;display:none}
+.done-banner.show{display:block}
+.done-banner h4{font-family:var(--display);font-size:20px;color:var(--green);letter-spacing:1px}
+.done-banner p{font-size:11px;color:var(--text);margin-top:3px}
+/* tests */
+.tr{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border:1px solid var(--border);margin-bottom:5px;font-size:11px;font-family:var(--mono)}
+.tr.pass{border-color:rgba(61,220,132,.3);background:rgba(61,220,132,.04)}
+.tr.fail{border-color:rgba(255,83,112,.3);background:rgba(255,83,112,.04)}
+.tr-ic{flex-shrink:0}
+.tr.pass .tr-ic::after{content:'✓';color:var(--green)}
+.tr.fail .tr-ic::after{content:'✗';color:var(--red)}
+/* hints */
+.hint-box{background:rgba(255,179,71,.05);border:1px solid rgba(255,179,71,.2);border-left:2px solid var(--amber);padding:10px 12px;margin-bottom:10px}
+.hint-label{font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.code-block{background:#050c10;border:1px solid var(--border);padding:10px 12px;font-family:var(--mono);font-size:11px;line-height:1.7;color:#8ecfff;overflow-x:auto;white-space:pre}
+/* docs */
+.docs-pre{font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--text);white-space:pre-wrap}
+/* blocked modal */
+#blocker{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:5000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+#blocker.show{display:flex}
+.bm-box{background:var(--surface);border:1px solid var(--red);padding:32px;max-width:360px;text-align:center}
+.bm-title{font-family:var(--display);font-size:32px;color:var(--red);letter-spacing:2px;margin-bottom:8px}
+.bm-msg{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:16px}
+.btn{display:inline-flex;align-items:center;padding:7px 18px;font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;border:1px solid;letter-spacing:1px;text-transform:uppercase;transition:all .2s}
+.btn-red{background:rgba(255,83,112,.1);border-color:var(--red2);color:var(--red)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div id="blocker">
+  <div class="bm-box">
+    <div class="bm-title">LAB LOCKED</div>
+    <div class="bm-msg">Complete and validate the current lab before proceeding. The pipeline is sequential — just like production.</div>
+    <button class="btn btn-red" onclick="document.getElementById('blocker').classList.remove('show')">Back to Current Lab</button>
+  </div>
+</div>
+
+<div class="app">
+  <div class="titlebar">
+    <div class="tb-left">
+      <div class="tb-dots"><div class="tb-dot cl"></div><div class="tb-dot mn"></div><div class="tb-dot mx"></div></div>
+      <div class="tb-title">mlops-lab — CI/CD for Machine Learning — Coding Lab</div>
+    </div>
+    <div class="tb-right">
+      <div class="prog-pill" id="progPill">LAB 1/6</div>
+      <div class="score-pill" id="scorePill">0 PTS</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sb-section">
+        <div class="sb-label">Project Files</div>
+        <div class="file-item active" id="fi-0" onclick="openLab(0)"><span class="fi-icon">🐍</span><span class="fi-name">train.py</span><span class="fi-badge todo">TODO</span></div>
+        <div class="file-item locked" id="fi-1" onclick="openLab(1)"><span class="fi-icon">🐍</span><span class="fi-name">validate.py</span><span class="fi-badge lock">🔒</span></div>
+        <div class="file-item locked" id="fi-2" onclick="openLab(2)"><span class="fi-icon">🐍</span><span class="fi-name">drift_detect.py</span><span class="fi-badge lock">🔒</span></div>
+        <div class="file-item locked" id="fi-3" onclick="openLab(3)"><span class="fi-icon">⚙️</span><span class="fi-name">ci_pipeline.yml</span><span class="fi-badge lock">🔒</span></div>
+        <div class="file-item locked" id="fi-4" onclick="openLab(4)"><span class="fi-icon">⚙️</span><span class="fi-name">cd_deploy.yml</span><span class="fi-badge lock">🔒</span></div>
+        <div class="file-item locked" id="fi-5" onclick="openLab(5)"><span class="fi-icon">🐍</span><span class="fi-name">monitor.py</span><span class="fi-badge lock">🔒</span></div>
+      </div>
+      <div class="sb-section" id="labNavWrap" style="padding:8px"></div>
+      <div class="sb-env">Python 3.10 · sklearn 1.3<br>MLflow 2.8 · GitHub Actions</div>
+    </div>
+
+    <!-- EDITOR -->
+    <div class="editor-area">
+      <div class="ed-tabs" id="edTabs">
+        <div class="ed-tab active" id="activeTab">train.py</div>
+      </div>
+      <div class="ed-wrap">
+        <div class="ln" id="lineNums">1</div>
+        <div class="code-area">
+          <textarea class="code-editor" id="editor" spellcheck="false" autocomplete="off"
+            oninput="onInput()" onkeydown="handleKey(event)" onscroll="syncLn()"></textarea>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="tbtn tbtn-run" id="runBtn" onclick="runSim()">▶ RUN</button>
+        <button class="tbtn tbtn-val" onclick="validateLab()">✓ VALIDATE</button>
+        <div class="sep"></div>
+        <button class="tbtn tbtn-hint" onclick="showNextHint()">💡 HINT</button>
+        <button class="tbtn tbtn-rst" onclick="resetEditor()">↺ Reset</button>
+        <div class="statusbar" id="statusbar">Ready</div>
+      </div>
+      <div class="terminal">
+        <div class="term-hdr">
+          TERMINAL
+          <span style="margin-left:auto;cursor:pointer;color:var(--muted)" onclick="clearTerm()">✕ clear</span>
+        </div>
+        <div class="term-body" id="term">
+          <div class="tl tdim">mlops-lab $ <span class="cur"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="rpanel">
+      <div class="rp-tabs">
+        <div class="rp-tab active" onclick="switchRP('mission')">MISSION</div>
+        <div class="rp-tab" onclick="switchRP('tests')">TESTS</div>
+        <div class="rp-tab" onclick="switchRP('hints')">HINTS</div>
+        <div class="rp-tab" onclick="switchRP('docs')">DOCS</div>
+      </div>
+      <div class="rp-body">
+        <div class="rp-sec show" id="rp-mission"><div id="missionHtml"></div></div>
+        <div class="rp-sec" id="rp-tests"><div id="testsHtml"><div style="font-family:var(--mono);font-size:11px;color:var(--muted)">Click VALIDATE to run checks.</div></div></div>
+        <div class="rp-sec" id="rp-hints"><div id="hintsHtml"><div style="font-family:var(--mono);font-size:11px;color:var(--muted)">Click 💡 HINT to reveal hints one at a time.</div></div></div>
+        <div class="rp-sec" id="rp-docs"><pre class="docs-pre" id="docsHtml"></pre></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── LAB DATA ─────────────────────────────────────────────────
+const CODES = [
+  "# train.py - Lab 1: Versioned Training Pipeline\n# TODO: Complete all sections marked ### YOUR CODE ###\n\nimport hashlib, json, os, pickle\nimport numpy as np\nfrom sklearn.datasets import load_iris\nfrom sklearn.ensemble import RandomForestClassifier\nfrom sklearn.metrics import accuracy_score, f1_score\nfrom sklearn.model_selection import train_test_split\n\nCONFIG = {\n    \"n_estimators\": 100,\n    \"max_depth\": 5,\n    \"random_state\": 42,\n    \"test_size\": 0.2,\n    \"model_version\": \"v1.0.0\",\n}\n\n\ndef compute_data_hash(X, y):\n    # ### YOUR CODE ###\n    # Compute SHA-256 hash: X.tobytes() + y.tobytes() -> hashlib.sha256(...).hexdigest()\n    pass\n\n\ndef load_and_split_data():\n    iris = load_iris()\n    X, y = iris.data, iris.target\n    # ### YOUR CODE ###\n    # Use train_test_split with test_size and random_state from CONFIG\n    X_train, X_test, y_train, y_test = None, None, None, None\n    return X_train, X_test, y_train, y_test, X, y\n\n\ndef train_model(X_train, y_train):\n    # ### YOUR CODE ###\n    # Instantiate RandomForestClassifier using CONFIG values\n    # Call .fit(X_train, y_train) and return the model\n    model = None\n    return model\n\n\ndef evaluate_model(model, X_test, y_test):\n    # ### YOUR CODE ###\n    # Return dict: {\"accuracy\": float, \"f1_score\": float}\n    # Use accuracy_score and f1_score(average='weighted')\n    metrics = {}\n    return metrics\n\n\ndef run_training():\n    print(\"[INFO] Starting training pipeline\")\n    X_train, X_test, y_train, y_test, X, y = load_and_split_data()\n    if X_train is None:\n        print(\"[ERROR] load_and_split_data() not implemented!\")\n        return\n    print(\"[INFO] Train:\", len(X_train), \"Test:\", len(X_test))\n    data_hash = compute_data_hash(X, y)\n    print(\"[INFO] Data hash:\", data_hash)\n    model = train_model(X_train, y_train)\n    if model is None:\n        print(\"[ERROR] train_model() not implemented!\")\n        return\n    metrics = evaluate_model(model, X_test, y_test)\n    print(\"[INFO] Metrics:\", metrics)\n    # ### YOUR CODE ###\n    # Save model.pkl with pickle.dump\n    # Save metadata.json with version, metrics, data_hash, config\n    print(\"[SUCCESS] Accuracy:\", metrics.get(\"accuracy\", 0))\n    return model, metrics, data_hash\n\n\nif __name__ == '__main__':\n    run_training()\n",
+  "# validate.py - Lab 2: Model Validation Gates\n# TODO: Implement all 4 gates + run_all_gates()\n\nimport numpy as np\nfrom sklearn.metrics import accuracy_score, f1_score, recall_score\nfrom sklearn.datasets import load_iris\nfrom sklearn.model_selection import train_test_split\n\nTHRESHOLDS = {\n    \"min_accuracy\": 0.85,\n    \"min_f1\": 0.80,\n    \"regression_tolerance\": 0.02,\n    \"min_per_class_recall\": 0.70,\n    \"expected_feature_count\": 4,\n}\nPROD_BASELINE = {\"accuracy\": 0.88, \"f1\": 0.87}\n\n\ndef load_test_data():\n    iris = load_iris()\n    X, y = iris.data, iris.target\n    _, X_test, _, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n    return X_test, y_test\n\n\ndef gate_schema_validation(X_test):\n    # ### YOUR CODE ###\n    # Check: X_test.shape[1] == THRESHOLDS[\"expected_feature_count\"]\n    # Check: not np.isnan(X_test).any()\n    # Return: (bool passed, str message)\n    passed = False\n    message = \"Not implemented\"\n    return passed, message\n\n\ndef gate_performance(model, X_test, y_test):\n    # ### YOUR CODE ###\n    # preds = model.predict(X_test)\n    # Compute accuracy_score and f1_score(average='weighted')\n    # Fail if accuracy < THRESHOLDS[\"min_accuracy\"] OR f1 < THRESHOLDS[\"min_f1\"]\n    # Return: (bool passed, dict metrics, str message)\n    passed = False\n    metrics = {}\n    message = \"Not implemented\"\n    return passed, metrics, message\n\n\ndef gate_regression(new_metrics):\n    # ### YOUR CODE ###\n    # new_accuracy >= PROD_BASELINE[\"accuracy\"] - THRESHOLDS[\"regression_tolerance\"]\n    # Return: (bool passed, str message)\n    passed = False\n    message = \"Not implemented\"\n    return passed, message\n\n\ndef gate_fairness(model, X_test, y_test):\n    # ### YOUR CODE ###\n    # preds = model.predict(X_test)\n    # per_class = recall_score(y_test, preds, average=None)\n    # Fail if ANY class recall < THRESHOLDS[\"min_per_class_recall\"]\n    # Return: (bool passed, dict per_class_recall, str message)\n    passed = False\n    per_class = {}\n    message = \"Not implemented\"\n    return passed, per_class, message\n\n\ndef run_all_gates(model=None):\n    # ### YOUR CODE ###\n    # Run all 4 gates IN ORDER. Stop and return on first FAIL.\n    # Print: \"[GATE N] Name: PASS/FAIL - message\"\n    # Return: {\"status\": \"PASS\"/\"FAIL\", \"failed_gate\": str, \"reason\": str, \"metrics\": dict}\n    print('=' * 50)\n    print('VALIDATION PIPELINE')\n    print('=' * 50)\n    from sklearn.ensemble import RandomForestClassifier\n    X_test, y_test = load_test_data()\n    if model is None:\n        iris = load_iris()\n        X_tr, _, y_tr, _ = train_test_split(iris.data, iris.target, test_size=0.2, random_state=42)\n        model = RandomForestClassifier(n_estimators=100, random_state=42)\n        model.fit(X_tr, y_tr)\n    result = {\"status\": \"FAIL\", \"failed_gate\": \"none\", \"reason\": \"Implement run_all_gates()\"}\n    # YOUR GATE LOGIC HERE\n    return result\n\n\nif __name__ == '__main__':\n    result = run_all_gates()\n    print(\"\\nFINAL:\", result[\"status\"])\n",
+  "# drift_detect.py - Lab 3: Statistical Drift Detection\n# PSI > 0.1 = slight | PSI > 0.2 = severe (trigger retrain!)\n\nimport numpy as np\nfrom sklearn.datasets import load_iris\nfrom sklearn.model_selection import train_test_split\n\nPSI_SLIGHT = 0.1\nPSI_SEVERE = 0.2\n\n\ndef get_reference_data():\n    iris = load_iris()\n    X_train, _, y_train, _ = train_test_split(iris.data, iris.target, test_size=0.2, random_state=42)\n    return X_train, y_train\n\n\ndef get_production_data(drift_magnitude=0.8):\n    np.random.seed(99)\n    iris = load_iris()\n    X = iris.data.copy()\n    X[:, 0] += drift_magnitude * 1.5\n    X[:, 2] += drift_magnitude * 0.8\n    X += np.random.normal(0, drift_magnitude * 0.3, X.shape)\n    return X[:100], iris.target[:100]\n\n\ndef compute_psi(reference, production, n_bins=10):\n    # ### YOUR CODE ###\n    # PSI = sum( (prod_pct - ref_pct) * log(prod_pct / ref_pct) )\n    # 1. bins = np.linspace(reference.min(), reference.max(), n_bins + 1)\n    # 2. np.histogram(reference, bins=bins) and np.histogram(production, bins=bins)\n    # 3. Convert counts to %, clip to 1e-6, apply formula\n    psi = 0.0\n    # YOUR CODE HERE\n    return psi\n\n\ndef compute_kl_divergence(reference, production, n_bins=10):\n    # ### YOUR CODE ###\n    # KL(P||Q) = sum(P * log(P/Q))  where P=production, Q=reference\n    # Same binning approach as compute_psi\n    kl = 0.0\n    # YOUR CODE HERE\n    return kl\n\n\ndef detect_feature_drift(X_ref, X_prod, feature_names=None):\n    # ### YOUR CODE ###\n    # For each feature column: compute_psi and compute_kl_divergence\n    # severity: 'none'/'slight'/'severe' based on PSI thresholds\n    # Return: [{\"feature\":str, \"psi\":float, \"kl_div\":float, \"severity\":str, \"alert\":bool}]\n    if feature_names is None:\n        feature_names = [\"f\" + str(i) for i in range(X_ref.shape[1])]\n    results = []\n    # YOUR CODE HERE\n    return results\n\n\ndef check_prediction_drift(model, X_ref, X_prod):\n    # ### YOUR CODE ###\n    # Compare class proportions: model.predict(X_ref) vs model.predict(X_prod)\n    # Flag if any class proportion changes > 0.15 absolute\n    # Return: (bool drift_detected, dict changes)\n    drift_detected = False\n    changes = {}\n    # YOUR CODE HERE\n    return drift_detected, changes\n\n\ndef generate_drift_report(feature_results, pred_drift, pred_changes):\n    # ### YOUR CODE ###\n    # RED if severe feature drift OR pred_drift\n    # YELLOW if slight drift, GREEN otherwise\n    # Return: {\"overall_status\":str, \"drifted_features\":list, \"recommendation\":str}\n    report = {}\n    # YOUR CODE HERE\n    return report\n\n\ndef run_drift_detection():\n    print('=' * 50 + '\\nDRIFT DETECTION\\n' + '=' * 50)\n    X_ref, y_ref = get_reference_data()\n    X_prod, y_prod = get_production_data(drift_magnitude=0.8)\n    names = [\"sepal_length\",\"sepal_width\",\"petal_length\",\"petal_width\"]\n    feature_results = detect_feature_drift(X_ref, X_prod, names)\n    print('\\nFeature Drift:')\n    for r in feature_results:\n        sev = r.get(\"severity\",\"?\")\n        icon = \"RED\" if sev==\"severe\" else (\"YLW\" if sev==\"slight\" else \" OK\")\n        print(\"  [\" + icon + \"] \" + r[\"feature\"] + \": PSI=\" + str(round(r.get(\"psi\",0),4)))\n    from sklearn.ensemble import RandomForestClassifier\n    model = RandomForestClassifier(n_estimators=50, random_state=42)\n    model.fit(X_ref, y_ref)\n    pred_drift, pred_changes = check_prediction_drift(model, X_ref, X_prod)\n    print('Prediction drift:', pred_drift)\n    report = generate_drift_report(feature_results, pred_drift, pred_changes)\n    print(\"STATUS:\", report.get(\"overall_status\",\"UNKNOWN\"))\n    return report\n\n\nif __name__ == '__main__':\n    run_drift_detection()\n",
+  "# ci_pipeline.yml - Lab 4: GitHub Actions CI for ML\n# Replace every FILL_ME_IN\n\nname: ML Training CI Pipeline\n\non:\n  push:\n    # ### YOUR CODE ### - trigger only on these path changes:\n    paths:\n      - 'FILL_ME_IN'\n\n  # ### YOUR CODE ### - nightly cron at 02:00 UTC\n  schedule:\n    - cron: 'FILL_ME_IN'\n\n  workflow_dispatch:\n\nenv:\n  PYTHON_VERSION: '3.10'\n  # ### YOUR CODE ### - set MODEL_VERSION to git commit SHA\n  # GitHub provides it as: ${{ github.sha }}\n  MODEL_VERSION: 'FILL_ME_IN'\n\njobs:\n\n  train:\n    name: Train Model\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: ${{ env.PYTHON_VERSION }}\n          cache: 'pip'\n\n      - name: Install dependencies\n        # ### YOUR CODE ### - pip install -r requirements.txt\n        run: |\n          FILL_ME_IN\n\n      - name: Run training\n        # ### YOUR CODE ### - python train.py\n        run: |\n          FILL_ME_IN\n        env:\n          MODEL_VERSION: ${{ env.MODEL_VERSION }}\n\n      - name: Upload model artifact\n        uses: actions/upload-artifact@v4\n        with:\n          name: model-${{ github.sha }}\n          path: model.pkl\n          retention-days: 30\n\n  validate:\n    name: Validate Model\n    runs-on: ubuntu-latest\n    # ### YOUR CODE ### - wait for 'train' job\n    needs: FILL_ME_IN\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: ${{ env.PYTHON_VERSION }}\n          cache: 'pip'\n      - run: pip install -r requirements.txt\n      - uses: actions/download-artifact@v4\n        with:\n          name: model-${{ github.sha }}\n\n      - name: Run validation gates\n        # ### YOUR CODE ### - python validate.py\n        run: |\n          FILL_ME_IN\n\n  register:\n    name: Register Model\n    runs-on: ubuntu-latest\n    # ### YOUR CODE ### - only after validate, only on main branch\n    needs: FILL_ME_IN\n    if: github.ref == 'refs/heads/main'\n    steps:\n      - uses: actions/checkout@v4\n      - run: pip install -r requirements.txt\n      - run: python -c \"print('Registered: iris_classifier @ Staging')\"\n",
+  "# cd_deploy.yml - Lab 5: Canary Deployment\n# Runs after CI pipeline succeeds on main\n\nname: ML Model CD - Canary Deployment\n\non:\n  # ### YOUR CODE ###\n  # Trigger when 'ML Training CI Pipeline' workflow completes\n  # Event: workflow_run, types: [completed]\n  workflow_run:\n    workflows: FILL_ME_IN\n    types: FILL_ME_IN\n    branches: [main]\n\njobs:\n\n  canary_deploy:\n    name: Deploy Canary (10% traffic)\n    runs-on: ubuntu-latest\n    # ### YOUR CODE ###\n    # Only run if CI workflow SUCCEEDED\n    # Check: github.event.workflow_run.conclusion == 'success'\n    if: FILL_ME_IN\n\n    outputs:\n      canary_healthy: ${{ steps.health_check.outputs.healthy }}\n      model_version: ${{ steps.deploy.outputs.version }}\n\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.10'\n      - run: pip install -r requirements.txt\n\n      - name: Deploy canary at 10% traffic\n        id: deploy\n        run: |\n          python -c \"\n          version = 'v-abc1234'\n          print('[DEPLOY] Canary 10% - version:', version)\n          # ### YOUR CODE ###\n          # Write to GITHUB_OUTPUT to pass version to other jobs:\n          # import os\n          # with open(os.environ['GITHUB_OUTPUT'], 'a') as f:\n          #     f.write('version=' + version + chr(10))\n          \"\n\n      - name: Wait for metrics to stabilize\n        # ### YOUR CODE ### - add a sleep command\n        run: |\n          echo 'Waiting for canary metrics...'\n          FILL_ME_IN\n\n      - name: Check canary health\n        id: health_check\n        run: |\n          python -c \"\n          import random\n          random.seed(42)\n          accuracy = round(random.uniform(0.87, 0.94), 4)\n          latency  = round(random.uniform(45, 110), 1)\n          print('[METRICS] accuracy:', accuracy, 'latency:', latency, 'ms')\n          healthy = accuracy >= 0.85 and latency <= 200\n          print('[METRICS] healthy:', healthy)\n          # ### YOUR CODE ###\n          # Write healthy to GITHUB_OUTPUT:\n          # import os\n          # with open(os.environ['GITHUB_OUTPUT'], 'a') as f:\n          #     f.write('healthy=' + str(healthy).lower() + chr(10))\n          \"\n\n  full_rollout:\n    name: Promote to 100% Traffic\n    runs-on: ubuntu-latest\n    needs: canary_deploy\n    # ### YOUR CODE ### - only if canary_healthy == 'true'\n    if: FILL_ME_IN\n    steps:\n      - run: |\n          echo '[PROMOTE] 100% traffic -> new model'\n          echo '[PROMOTE] Stage: Staging -> Production'\n\n  rollback:\n    name: Auto Rollback\n    runs-on: ubuntu-latest\n    needs: canary_deploy\n    # ### YOUR CODE ### - only if canary_healthy != 'true'\n    if: FILL_ME_IN\n    steps:\n      - run: |\n          echo '[ROLLBACK] Canary FAILED - reverting to stable model'\n          echo '[ALERT] On-call team notified'\n",
+  "# monitor.py - Lab 6: Production Monitor + Auto-Retraining\n# Runs every hour. Closes the CI/CD feedback loop.\n\nimport json, numpy as np\nfrom datetime import datetime, timedelta\n\nMONITOR_CONFIG = {\n    \"accuracy_drop_threshold\": 0.05,\n    \"max_retrains_per_day\": 2,\n    \"min_hours_between_retrains\": 4,\n    \"baseline_accuracy\": 0.90,\n}\n\n\nclass ProductionState:\n    def __init__(self):\n        np.random.seed(42)\n        self.recent_predictions = np.random.randint(0, 3, 500)\n        noise = np.random.binomial(1, 0.12, 500).astype(bool)\n        self.recent_true_labels = self.recent_predictions.copy()\n        self.recent_true_labels[noise] = (self.recent_true_labels[noise] + 1) % 3\n        self.prod_means = np.array([5.9, 3.2, 4.8, 1.8])\n        self.ref_means  = np.array([5.1, 3.0, 3.8, 1.2])\n        self.ref_stds   = np.array([0.8, 0.4, 1.8, 0.8])\n        self.retrain_log = []\n\n\nstate = ProductionState()\n\n\ndef check_rolling_accuracy(predictions, true_labels):\n    # ### YOUR CODE ###\n    # accuracy = (predictions == true_labels).sum() / len(predictions)\n    # drop = MONITOR_CONFIG[\"baseline_accuracy\"] - accuracy\n    # alert = drop > MONITOR_CONFIG[\"accuracy_drop_threshold\"]\n    # severity: 'critical' if drop > 2x threshold, 'warning' if alert, 'none' otherwise\n    # Return: {\"accuracy\":float, \"drop_from_baseline\":float, \"alert\":bool, \"severity\":str}\n    result = {}\n    # YOUR CODE HERE\n    return result\n\n\ndef check_feature_drift_simplified(prod_means, ref_means, ref_stds):\n    # ### YOUR CODE ###\n    # drift_score = abs(prod_mean - ref_mean) / ref_std  (z-score style)\n    # Flag as drifted if drift_score > 2.0\n    # Return: [{\"feature\":str, \"drift_score\":float, \"drifted\":bool}]\n    names = [\"sepal_length\",\"sepal_width\",\"petal_length\",\"petal_width\"]\n    results = []\n    # YOUR CODE HERE\n    return results\n\n\ndef check_circuit_breaker(retrain_log):\n    # ### YOUR CODE ###\n    # Count retrains in last 24h -> must be < max_retrains_per_day\n    # Time since last retrain -> must be > min_hours_between_retrains\n    # Return: (bool can_retrain, str reason_if_blocked)\n    # YOUR CODE HERE\n    return True, ''\n\n\ndef trigger_retraining(reason, severity, metrics):\n    # ### YOUR CODE ###\n    # Build payload dict, print as json.dumps(payload, indent=2)\n    # Return: (True, 'https://github.com/myorg/ml-pipeline/actions/runs/99999')\n    triggered = False\n    run_url = ''\n    # YOUR CODE HERE\n    return triggered, run_url\n\n\ndef generate_alert(issues, metrics):\n    # ### YOUR CODE ###\n    # Return dict: timestamp, severity, issues list, recommended_action\n    alert = {}\n    # YOUR CODE HERE\n    return alert\n\n\ndef run_monitoring_cycle():\n    print('MONITORING CYCLE -', datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC'))\n    issues = []\n    overall_status = 'GREEN'\n\n    acc = check_rolling_accuracy(state.recent_predictions, state.recent_true_labels)\n    print('[ACCURACY]', acc.get('accuracy','N/A'), '| drop:', acc.get('drop_from_baseline','N/A'))\n    if acc.get('alert'):\n        issues.append({'type': 'accuracy_drop', 'details': acc})\n        overall_status = 'RED' if acc.get('severity') == 'critical' else 'YELLOW'\n\n    drift = check_feature_drift_simplified(state.prod_means, state.ref_means, state.ref_stds)\n    print('[DRIFT]')\n    for r in drift:\n        print(' ', r['feature'], 'score='+str(round(r.get('drift_score',0),3)), 'DRIFTED' if r.get('drifted') else 'OK')\n        if r.get('drifted'):\n            issues.append({'type': 'feature_drift', 'feature': r['feature']})\n            if overall_status == 'GREEN':\n                overall_status = 'YELLOW'\n\n    print('[STATUS]', overall_status, '| Issues:', len(issues))\n\n    if issues:\n        can_retrain, block_reason = check_circuit_breaker(state.retrain_log)\n        if can_retrain:\n            triggered, url = trigger_retraining(\n                reason=issues[0]['type'], severity=overall_status,\n                metrics={'accuracy': acc.get('accuracy')}\n            )\n            if triggered:\n                state.retrain_log.append(datetime.utcnow())\n                print('[RETRAIN] Triggered:', url)\n        else:\n            print('[CIRCUIT BREAKER] Blocked:', block_reason)\n            alert = generate_alert(issues, acc)\n            print('[ALERT]', json.dumps(alert, indent=2))\n    return overall_status, issues\n\n\nif __name__ == '__main__':\n    status, issues = run_monitoring_cycle()\n    print('Final:', status)\n",
+];
+
+const HINTS = [
+  [{"label": "Data Hash Pattern", "code": "data_bytes = X.tobytes() + y.tobytes()\nreturn hashlib.sha256(data_bytes).hexdigest()"}, {"label": "Train/Test Split with Fixed Seed", "code": "X_train, X_test, y_train, y_test = train_test_split(\n    X, y,\n    test_size=CONFIG[\"test_size\"],\n    random_state=CONFIG[\"random_state\"]  # CRITICAL\n)"}, {"label": "RandomForestClassifier from CONFIG", "code": "model = RandomForestClassifier(\n    n_estimators=CONFIG[\"n_estimators\"],\n    max_depth=CONFIG[\"max_depth\"],\n    random_state=CONFIG[\"random_state\"]\n)\nmodel.fit(X_train, y_train)\nreturn model"}, {"label": "Evaluate and Save", "code": "preds = model.predict(X_test)\nmetrics = {\n    \"accuracy\": accuracy_score(y_test, preds),\n    \"f1_score\": f1_score(y_test, preds, average=\"weighted\")\n}\n# Save:\nwith open(\"model.pkl\", \"wb\") as f:\n    pickle.dump(model, f)\nwith open(\"metadata.json\", \"w\") as f:\n    json.dump({\"version\": CONFIG[\"model_version\"], \"metrics\": metrics}, f)"}],
+  [{"label": "Schema Gate", "code": "n_features = X_test.shape[1]\nif n_features != THRESHOLDS[\"expected_feature_count\"]:\n    return False, f\"Expected {THRESHOLDS['expected_feature_count']} features, got {n_features}\"\nif np.isnan(X_test).any():\n    return False, \"NaN values detected\"\nreturn True, \"Schema valid\""}, {"label": "Performance Gate", "code": "preds = model.predict(X_test)\nacc = accuracy_score(y_test, preds)\nf1  = f1_score(y_test, preds, average=\"weighted\")\nmetrics = {\"accuracy\": acc, \"f1_score\": f1}\nif acc < THRESHOLDS[\"min_accuracy\"]:\n    return False, metrics, f\"Accuracy {acc:.4f} < {THRESHOLDS['min_accuracy']}\"\nif f1 < THRESHOLDS[\"min_f1\"]:\n    return False, metrics, f\"F1 {f1:.4f} < {THRESHOLDS['min_f1']}\"\nreturn True, metrics, \"Performance OK\""}, {"label": "Fairness Gate (per-class recall)", "code": "preds = model.predict(X_test)\nper_class = recall_score(y_test, preds, average=None)\nfailing = [i for i, r in enumerate(per_class) if r < THRESHOLDS[\"min_per_class_recall\"]]\nif failing:\n    return False, dict(enumerate(per_class)), f\"Classes {failing} below threshold\"\nreturn True, dict(enumerate(per_class)), \"Fairness OK\""}, {"label": "run_all_gates structure", "code": "# Gate 1\npassed, msg = gate_schema_validation(X_test)\nprint(f\"[GATE 1] Schema: {'PASS' if passed else 'FAIL'} - {msg}\")\nif not passed:\n    return {\"status\": \"FAIL\", \"failed_gate\": \"schema\", \"reason\": msg}\n# Gate 2\npassed, metrics, msg = gate_performance(model, X_test, y_test)\nif not passed:\n    return {\"status\": \"FAIL\", \"failed_gate\": \"performance\", \"reason\": msg}\n# ... continue for gates 3 and 4\nreturn {\"status\": \"PASS\", \"metrics\": metrics}"}],
+  [{"label": "PSI Binning and Formula", "code": "bins = np.linspace(reference.min(), reference.max(), n_bins + 1)\nref_counts, _  = np.histogram(reference, bins=bins)\nprod_counts, _ = np.histogram(production, bins=bins)\nref_pct  = np.clip(ref_counts / len(reference), 1e-6, None)\nprod_pct = np.clip(prod_counts / len(production), 1e-6, None)\npsi = np.sum((prod_pct - ref_pct) * np.log(prod_pct / ref_pct))\nreturn psi"}, {"label": "KL Divergence", "code": "# Same binning as PSI:\n# kl = np.sum(prod_pct * np.log(prod_pct / ref_pct))\n# where P=prod_pct, Q=ref_pct"}, {"label": "detect_feature_drift loop", "code": "for i, name in enumerate(feature_names):\n    psi = compute_psi(X_ref[:, i], X_prod[:, i])\n    kl  = compute_kl_divergence(X_ref[:, i], X_prod[:, i])\n    sev = \"severe\" if psi > PSI_SEVERE else (\"slight\" if psi > PSI_SLIGHT else \"none\")\n    results.append({\"feature\": name, \"psi\": psi, \"kl_div\": kl,\n                    \"severity\": sev, \"alert\": sev != \"none\"})"}, {"label": "generate_drift_report", "code": "severe = [r[\"feature\"] for r in feature_results if r[\"severity\"]==\"severe\"]\nslight = [r[\"feature\"] for r in feature_results if r[\"severity\"]==\"slight\"]\nif severe or pred_drift:\n    status = \"RED\"\n    rec = \"Immediate retraining required\"\nelif slight:\n    status = \"YELLOW\"\n    rec = \"Monitor closely - drift detected\"\nelse:\n    status = \"GREEN\"\n    rec = \"All features stable\"\nreturn {\"overall_status\": status, \"drifted_features\": severe, \"recommendation\": rec}"}],
+  [{"label": "Path triggers + cron schedule", "code": "on:\n  push:\n    paths:\n      - 'src/**'\n      - 'configs/**'\n      - 'data/**'\n  schedule:\n    - cron: '0 2 * * *'  # 2:00 AM UTC nightly\n  workflow_dispatch:"}, {"label": "MODEL_VERSION from git SHA", "code": "env:\n  MODEL_VERSION: ${{ github.sha }}"}, {"label": "Job dependency chain", "code": "validate:\n    needs: [train]    # waits for train\n\n  register:\n    needs: [validate] # waits for validate\n    if: github.ref == 'refs/heads/main'"}],
+  [{"label": "workflow_run trigger", "code": "on:\n  workflow_run:\n    workflows: [\"ML Training CI Pipeline\"]\n    types: [completed]\n    branches: [main]"}, {"label": "Check CI conclusion", "code": "canary_deploy:\n    if: github.event.workflow_run.conclusion == 'success'"}, {"label": "Conditional rollout/rollback", "code": "full_rollout:\n    needs: canary_deploy\n    if: needs.canary_deploy.outputs.canary_healthy == 'true'\n\n  rollback:\n    needs: canary_deploy\n    if: needs.canary_deploy.outputs.canary_healthy != 'true'"}],
+  [{"label": "Rolling Accuracy Check", "code": "correct = (predictions == true_labels).sum()\naccuracy = correct / len(predictions)\ndrop = MONITOR_CONFIG[\"baseline_accuracy\"] - accuracy\nalert = drop > MONITOR_CONFIG[\"accuracy_drop_threshold\"]\nthreshold = MONITOR_CONFIG[\"accuracy_drop_threshold\"]\nseverity = \"critical\" if drop > 2*threshold else (\"warning\" if alert else \"none\")\nreturn {\"accuracy\": accuracy, \"drop_from_baseline\": drop, \"alert\": alert, \"severity\": severity}"}, {"label": "Z-score Feature Drift", "code": "for i, name in enumerate(names):\n    score = abs(float(prod_means[i]) - float(ref_means[i])) / float(ref_stds[i])\n    results.append({\"feature\": name, \"drift_score\": score, \"drifted\": score > 2.0})"}, {"label": "Circuit Breaker", "code": "now = datetime.utcnow()\nlast_24h = [t for t in retrain_log if now - t < timedelta(hours=24)]\nif len(last_24h) >= MONITOR_CONFIG[\"max_retrains_per_day\"]:\n    return False, \"Max daily retrains reached\"\nif last_24h:\n    hours_since = (now - max(last_24h)).seconds / 3600\n    if hours_since < MONITOR_CONFIG[\"min_hours_between_retrains\"]:\n        return False, f\"Too soon: {hours_since:.1f}h since last retrain\"\nreturn True, \"\""}, {"label": "Trigger Retraining", "code": "payload = {\n    \"ref\": \"main\",\n    \"inputs\": {\"trigger_reason\": reason, \"severity\": severity}\n}\nprint(json.dumps(payload, indent=2))\ntriggered = True\nrun_url = \"https://github.com/myorg/ml-pipeline/actions/runs/99999\"\nreturn triggered, run_url"}],
+];
+
+const CHECKS = [
+  [["Split uses fixed random_state from CONFIG", "train_test_split.*random_state\\s*=\\s*CONFIG"], ["Data hash uses hashlib.sha256", "hashlib\\.sha256"], ["RandomForestClassifier from CONFIG", "RandomForestClassifier\\("], ["accuracy_score computed", "accuracy_score"], ["f1_score computed", "f1_score"], ["Model saved with pickle.dump", "pickle\\.dump"]],
+  [["Schema gate checks feature count", "expected_feature_count"], ["Schema gate checks for NaN", "isnan"], ["Performance gate checks accuracy", "min_accuracy"], ["Fairness gate uses average=None", "average\\s*=\\s*None"], ["Regression gate uses PROD_BASELINE", "PROD_BASELINE"], ["run_all_gates returns PASS/FAIL status", "\"status\""]],
+  [["PSI uses np.histogram for binning", "np\\.histogram"], ["PSI formula uses np.log", "np\\.log"], ["KL divergence computed", "kl|KL"], ["Severity levels assigned using PSI thresholds", "PSI_SLIGHT|PSI_SEVERE"], ["generate_drift_report returns RED/YELLOW/GREEN", "RED|YELLOW|GREEN"]],
+  [["Push trigger has path filters", "paths:[\\s\\S]{0,200}(src|data|configs)"], ["Schedule cron defined", "cron:\\s*['\\\"][0-9\\s\\*/]+['\\\"]"], ["MODEL_VERSION uses github.sha", "github\\.sha"], ["pip install -r requirements.txt present", "pip install -r requirements\\.txt"], ["validate job has needs: train", "needs:.*train"]],
+  [["workflow_run trigger references CI pipeline", "ML Training CI Pipeline"], ["Canary job checks conclusion == success", "conclusion.*success"], ["Wait/sleep step added", "sleep"], ["full_rollout condition: canary_healthy == true", "canary_healthy.*true"], ["rollback condition: canary_healthy != true", "canary_healthy.*!=.*true"]],
+  [["Rolling accuracy computes drop from baseline", "baseline_accuracy"], ["Feature drift uses z-score (ref_std division)", "ref_stds|ref_std"], ["Circuit breaker checks max_retrains_per_day", "max_retrains_per_day"], ["trigger_retraining sets triggered=True", "triggered\\s*=\\s*True"], ["generate_alert returns structured dict", "alert\\[|alert\\.update|alert = \\{"]],
+];
+
+const DOCS = [
+  "REPRODUCIBILITY REFERENCE\n\ntrain_test_split(X, y, test_size, random_state)\n  Returns X_train, X_test, y_train, y_test\n  random_state MUST come from CONFIG\n\nRandomForestClassifier(n_estimators, max_depth, random_state)\n  Call .fit(X_train, y_train) to train\n\naccuracy_score(y_true, y_pred) -> float\nf1_score(y_true, y_pred, average='weighted') -> float\n\nhashlib.sha256(bytes).hexdigest() -> str\n  ndarray.tobytes() converts array to bytes\n\npickle.dump(obj, file_obj) - saves model\njson.dump(dict, file_obj) - saves metadata",
+  "VALIDATION API\n\naccuracy_score(y_true, y_pred) -> float\nf1_score(y_true, y_pred, average='weighted') -> float\nrecall_score(y_true, y_pred, average=None) -> array\n  Returns per-class recall values. Index = class label.\n\nnp.isnan(X).any() -> bool\n  True if any NaN values exist\n\nX.shape[1] -> int\n  Number of features (columns)\n\nPROD_BASELINE = {accuracy: 0.88, f1: 0.87}\nTHRESHOLDS = {min_accuracy: 0.85, min_f1: 0.80,\n              regression_tolerance: 0.02,\n              min_per_class_recall: 0.70,\n              expected_feature_count: 4}",
+  "DRIFT DETECTION REFERENCE\n\nPSI Interpretation:\n  PSI < 0.1  -> No significant drift (GREEN)\n  PSI 0.1-0.2 -> Slight drift (YELLOW - monitor)\n  PSI > 0.2  -> Significant drift (RED - retrain!)\n\nnp.histogram(data, bins) -> (counts, bin_edges)\n  counts: array of how many values per bin\n\nnp.linspace(start, stop, num) -> array\n  Creates evenly-spaced bin edges\n\nnp.clip(arr, min_val, max_val) -> array\n  Clamp values - use 1e-6 floor to avoid log(0)\n\nnp.log(array) -> element-wise natural log",
+  "GITHUB ACTIONS REFERENCE\n\non.push.paths\n  List of glob patterns. Pipeline fires only\n  when matched files change.\n  Use: 'src/**' 'configs/**' 'data/**'\n\non.schedule.cron\n  Format: minute hour day month weekday\n  '0 2 * * *' = 2am daily\n\ngithub.sha\n  The full git commit SHA of current run.\n  Use for MODEL_VERSION to ensure traceability.\n\njobs.X.needs\n  Array of job names that must succeed first.\n  Creates sequential dependency chain.\n\nactions/upload-artifact@v4\n  Passes files between jobs in the same run.",
+  "CANARY DEPLOYMENT REFERENCE\n\non.workflow_run\n  Triggers when another workflow completes.\n  workflows: [\"exact workflow name\"]\n  types: [completed]\n  Check conclusion == 'success' in job if:\n\nJob outputs\n  Set:  echo 'key=value' >> $GITHUB_OUTPUT\n  Read: needs.job_name.outputs.key\n\nConditional jobs\n  if: needs.job.outputs.value == 'true'\n\nCanary strategy:\n  1. Deploy new model to 10% of traffic\n  2. Wait for live metrics to stabilize\n  3. If healthy -> promote to 100%\n  4. If unhealthy -> rollback to previous",
+  "MONITORING PATTERNS\n\nRolling accuracy:\n  correct = (predictions == labels).sum()\n  accuracy = correct / len(predictions)\n\nZ-score drift:\n  score = abs(prod_mean - ref_mean) / ref_std\n  Flag if score > 2.0 (2 standard deviations)\n\nDatetime windowing:\n  datetime.utcnow()\n  timedelta(hours=24)\n  now - t < timedelta(hours=24)\n\nCircuit breaker prevents:\n  - More than N retrains per day\n  - Retraining too soon after last retrain\n  - Infinite retraining loops\n\nGitHub Actions API (simulated):\n  POST /repos/{repo}/actions/workflows/{wf}/dispatches\n  Body: {ref: 'main', inputs: {reason, severity}}",
+];
+
+const FILES    = ["train.py", "validate.py", "drift_detect.py", "ci_pipeline.yml", "cd_deploy.yml", "monitor.py"];
+const TITLES   = ["TRAINING PIPELINE", "VALIDATION GATES", "DRIFT DETECTION", "CI PIPELINE (YAML)", "CD PIPELINE (YAML)", "PRODUCTION MONITOR"];
+const SUBS     = ["Build a versioned, reproducible training script", "Build automated quality gates that block bad models", "Detect when production data is diverging from training", "Wire training + validation into GitHub Actions CI", "Automated canary deployment with auto-rollback", "Close the loop \u2014 auto-trigger retraining on drift"];
+const DESCS    = ["Every CI/CD pipeline starts here. Write a training script that does NOT just train a model \u2014 it <strong>versions everything</strong>: data hash, git SHA, random seeds, hyperparameters. Every run must be reproducible.", "A model that passes training does not deserve production. Build the validation pipeline \u2014 the gatekeeper. Your gates must be <strong>hard blockers</strong>: any gate fails \u2192 pipeline stops.", "Models decay silently. Build a <strong>statistical drift detector</strong> that compares production data distributions against training distributions and fires alerts when they diverge.", "This is where code meets infrastructure. Write the <strong>GitHub Actions CI workflow</strong> that automatically triggers training and validation on every push. The YAML IS the pipeline.", "CI gets the model ready. CD puts it in front of users \u2014 carefully. Implement <strong>canary deployment</strong>: 10% traffic \u2192 health check \u2192 promote to 100% or auto-rollback.", "The final piece. This script <strong>closes the entire CI/CD loop</strong>: checks drift, checks live accuracy, and when something is wrong \u2014 automatically fires the retraining trigger."];
+const OBJS     = [["Load Iris with fixed random_state from CONFIG", "Compute SHA-256 hash of training data", "Train RandomForestClassifier from CONFIG params", "Compute accuracy and weighted F1", "Save model.pkl + metadata.json"], ["Gate 1: Schema validation (feature count + no NaN)", "Gate 2: Performance (accuracy + F1 thresholds)", "Gate 3: Regression vs production baseline", "Gate 4: Per-class fairness (recall_score average=None)", "run_all_gates() stops on first failure"], ["compute_psi() using np.histogram binning", "compute_kl_divergence() using same approach", "detect_feature_drift() for all 4 features", "check_prediction_drift() on model outputs", "generate_drift_report() returning RED/YELLOW/GREEN"], ["Push trigger with path filters (src/**, data/**)", "Nightly cron schedule at 02:00 UTC", "MODEL_VERSION set to github.sha", "pip install + python train.py commands", "validate job has needs: [train]"], ["workflow_run trigger on CI pipeline completion", "Canary deploy job checks conclusion == success", "Wait/sleep step before health check", "full_rollout fires if canary_healthy == true", "rollback fires if canary_healthy != true"], ["check_rolling_accuracy with drop + severity", "check_feature_drift_simplified (z-score method)", "check_circuit_breaker (max retrains per day)", "trigger_retraining with payload + returns True", "generate_alert with severity and timestamp"]];
+const PTS      = [100, 120, 150, 150, 160, 180];
+
+
+// ─── STATE ────────────────────────────────────────────────────
+let cur = 0;
+let hintIdx = [];   // per-lab hint index
+let userCode = CODES.slice(); // mutable copy
+let labDone = Array(6).fill(false);
+let labUnlocked = [true,false,false,false,false,false];
+let totalPts = 0;
+
+for(let i=0;i<6;i++) hintIdx.push(0);
+
+// ─── INIT ─────────────────────────────────────────────────────
+function init(){
+  renderLabNav();
+  openLab(0);
+}
+
+function renderLabNav(){
+  let html='';
+  for(let i=0;i<6;i++){
+    const cls = labDone[i]?'border-color:rgba(61,220,132,.4)':i===cur?'border-color:var(--cyan2);background:rgba(88,208,255,.05)':'border-color:transparent';
+    const lock = !labUnlocked[i]?'opacity:.3;pointer-events:none':'';
+    const check = labDone[i]?' ✓':!labUnlocked[i]?' 🔒':'';
+    html+=`<div onclick="openLab(${i})" style="padding:6px 8px;border:1px solid;border-radius:2px;margin-bottom:4px;cursor:pointer;${cls};${lock}">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted)">LAB 0${i+1}${check}</div>
+      <div style="font-size:11px;color:var(--white);font-weight:600;margin-top:2px">${TITLES[i]}</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--amber)">+${PTS[i]} pts</div>
+    </div>`;
+  }
+  document.getElementById('labNavWrap').innerHTML=html;
+}
+
+function openLab(idx){
+  if(!labUnlocked[idx]&&idx!==0){ document.getElementById('blocker').classList.add('show'); return; }
+  cur=idx;
+  // editor
+  const ed=document.getElementById('editor');
+  ed.value=userCode[idx];
+  updateLN();
+  document.getElementById('activeTab').textContent=FILES[idx];
+  document.getElementById('statusbar').textContent=FILES[idx]+' — Ready';
+  // sidebar
+  for(let i=0;i<6;i++){
+    const fi=document.getElementById('fi-'+i);
+    fi.classList.toggle('active',i===idx);
+  }
+  renderLabNav();
+  renderMission();
+  renderDocs();
+  // reset hints panel message but keep earned hints
+  renderHints();
+  updateScore();
+  clearTerm();
+  tprint('tdim','mlops-lab $ # Opened '+FILES[idx]);
+  tprint('ti','# Lab '+(idx+1)+': '+TITLES[idx]);
+  tprint('tdim','# Fill all ### YOUR CODE ### sections, then RUN and VALIDATE');
+}
+
+// ─── EDITOR ───────────────────────────────────────────────────
+function onInput(){
+  const ed=document.getElementById('editor');
+  userCode[cur]=ed.value;
+  updateLN();
+  document.getElementById('statusbar').textContent=FILES[cur]+' — Modified';
+}
+
+function handleKey(e){
+  if(e.key==='Tab'){
+    e.preventDefault();
+    const ta=document.getElementById('editor');
+    const s=ta.selectionStart,en=ta.selectionEnd;
+    ta.value=ta.value.substring(0,s)+'    '+ta.value.substring(en);
+    ta.selectionStart=ta.selectionEnd=s+4;
+    onInput();
+  }
+}
+
+function syncLn(){
+  const ta=document.getElementById('editor');
+  document.getElementById('lineNums').scrollTop=ta.scrollTop;
+}
+
+function updateLN(){
+  const lines=document.getElementById('editor').value.split('\n').length;
+  document.getElementById('lineNums').textContent=
+    Array.from({length:lines},(_,i)=>i+1).join('\n');
+}
+
+// ─── TERMINAL ─────────────────────────────────────────────────
+function tprint(cls,msg){
+  const body=document.getElementById('term');
+  const el=document.createElement('div');
+  el.className='tl '+cls;
+  el.textContent=msg;
+  body.appendChild(el);
+  body.scrollTop=body.scrollHeight;
+}
+function clearTerm(){
+  document.getElementById('term').innerHTML='<div class="tl tdim">mlops-lab $ <span class="cur"></span></div>';
+}
+
+// ─── RUN SIMULATION ───────────────────────────────────────────
+async function runSim(){
+  const code=userCode[cur];
+  clearTerm();
+  document.getElementById('runBtn').disabled=true;
+  document.getElementById('statusbar').textContent='Running...';
+
+  const lines=getSimLines(cur,code);
+  for(const [cls,msg,delay] of lines){
+    await sleep(delay||80);
+    tprint(cls,msg);
+  }
+  document.getElementById('runBtn').disabled=false;
+  document.getElementById('statusbar').textContent=FILES[cur]+' — Done';
+}
+
+function getSimLines(idx,code){
+  const has=s=>code.includes(s);
+  const lines=[];
+  const f=FILES[idx];
+
+  if(f==='train.py'){
+    lines.push(['tcmd','$ python train.py',100]);
+    lines.push(['ti','[INFO] Starting training pipeline',80]);
+    if(!has('train_test_split')||code.indexOf('None, None, None, None')>code.indexOf('def load_and_split')){
+      lines.push(['terr','AttributeError: NoneType has no attribute shape',80]);
+      lines.push(['terr','  -> load_and_split_data() returned None. Implement train_test_split.',60]);
+    } else {
+      lines.push(['tok','[INFO] Train: 120  Test: 30',80]);
+      if(!has('hashlib.sha256')) lines.push(['twarn','[WARN] Data hash: None - compute_data_hash() not done',80]);
+      else lines.push(['tok','[INFO] Data hash: a3f8e2c1d9b547ad6f2e... (SHA-256)',80]);
+      if(!has('RandomForestClassifier(')) lines.push(['terr','AttributeError: NoneType has no predict - train_model() returned None',80]);
+      else {
+        lines.push(['tok','[INFO] Model trained: RandomForestClassifier',120]);
+        if(!has('accuracy_score')) lines.push(['twarn','[WARN] Metrics empty - implement evaluate_model()',80]);
+        else {
+          lines.push(['tok',"[INFO] Metrics: {'accuracy': 0.9667, 'f1_score': 0.9660}",80]);
+          if(!has('pickle.dump')) lines.push(['twarn','[WARN] Model not saved - implement pickle.dump section',80]);
+          else { lines.push(['tok','[SUCCESS] model.pkl saved',60]); lines.push(['tok','[SUCCESS] metadata.json saved',60]); }
+          lines.push(['tok','[SUCCESS] Training complete. Accuracy: 0.9667',100]);
+        }
+      }
+    }
+  }
+  else if(f==='validate.py'){
+    lines.push(['tcmd','$ python validate.py',100]);
+    lines.push(['ti','='+'='.repeat(39),50]);
+    lines.push(['ti','VALIDATION PIPELINE',50]);
+    lines.push(['ti','='+'='.repeat(39),50]);
+    const g1=has('expected_feature_count')||has('isnan');
+    const g2=has('min_accuracy')&&has('accuracy_score');
+    const g3=has('PROD_BASELINE')&&has('regression_tolerance');
+    const g4=has('average=None')||has("average='None'");
+    lines.push([g1?'tok':'twarn','[GATE 1] Schema: '+(g1?'PASS - 4 features, no NaN':'SKIP - implement gate_schema_validation()'),100]);
+    lines.push([g2?'tok':'twarn','[GATE 2] Performance: '+(g2?'PASS - accuracy=0.9667 >= 0.85':'SKIP - implement gate_performance()'),100]);
+    lines.push([g3?'tok':'twarn','[GATE 3] Regression: '+(g3?'PASS - 0.9667 >= 0.88-0.02':'SKIP - implement gate_regression()'),100]);
+    lines.push([g4?'tok':'twarn','[GATE 4] Fairness: '+(g4?'PASS - all classes recall >= 0.70':'SKIP - use recall_score(average=None)'),100]);
+    if(g1&&g2&&g3&&g4&&!code.includes('# YOUR GATE LOGIC HERE'))
+      lines.push(['tok','\nFINAL: PASS',80]);
+    else lines.push(['twarn','\nFINAL: FAIL - implement run_all_gates() logic',80]);
+  }
+  else if(f==='drift_detect.py'){
+    lines.push(['tcmd','$ python drift_detect.py',100]);
+    const hasPSI=has('np.histogram');
+    const hasReport=has('overall_status')&&(has('RED')||has('GREEN'));
+    if(!hasPSI) lines.push(['twarn','compute_psi() -> 0.0 (implement np.histogram binning)',80]);
+    else {
+      lines.push(['tok','\nFeature Drift Results:',80]);
+      lines.push(['terr','  [RED] sepal_length: PSI=0.3421, KL=0.2841 [SEVERE]',80]);
+      lines.push(['twarn','  [YLW] sepal_width:  PSI=0.0823, KL=0.0612 [SLIGHT]',80]);
+      lines.push(['terr','  [RED] petal_length: PSI=0.2214, KL=0.1923 [SEVERE]',80]);
+      lines.push(['tok','  [ OK] petal_width:  PSI=0.0341, KL=0.0214 [NONE]',80]);
+    }
+    if(!hasReport) lines.push(['twarn','\nOVERALL: UNKNOWN - implement generate_drift_report()',80]);
+    else { lines.push(['terr','\nOVERALL: RED',80]); lines.push(['terr','Recommendation: Immediate retraining - 2 features severely drifted',80]); }
+  }
+  else if(f==='ci_pipeline.yml'){
+    lines.push(['tcmd','$ yaml-lint ci_pipeline.yml',100]);
+    const p1=has("paths:")&&!has("- 'FILL_ME_IN'");
+    const p2=has("cron: '0")||has('cron: "0');
+    const p3=has('github.sha')&&!has("MODEL_VERSION: 'FILL_ME_IN'");
+    const p4=has('pip install -r requirements.txt');
+    const p5=(has('needs: [train]')||has('needs: train'))&&!has('needs: FILL_ME_IN');
+    lines.push([p1?'tok':'terr','[CHECK] Push path triggers: '+(p1?'OK':'FAIL - replace FILL_ME_IN with src/**, data/**'),80]);
+    lines.push([p2?'tok':'terr','[CHECK] Schedule cron: '+(p2?"OK - nightly at 02:00 UTC":"FAIL - use cron: '0 2 * * *'"),80]);
+    lines.push([p3?'tok':'terr','[CHECK] MODEL_VERSION = github.sha: '+(p3?'OK':'FAIL - set MODEL_VERSION: ${{ github.sha }}'),80]);
+    lines.push([p4?'tok':'terr','[CHECK] pip install: '+(p4?'OK':'FAIL - add pip install -r requirements.txt'),80]);
+    lines.push([p5?'tok':'terr','[CHECK] validate needs train: '+(p5?'OK':'FAIL - add needs: [train] to validate job'),80]);
+  }
+  else if(f==='cd_deploy.yml'){
+    lines.push(['tcmd','$ yaml-lint cd_deploy.yml',100]);
+    const p1=has('ML Training CI Pipeline');
+    const p2=has("conclusion == 'success'")||has('conclusion == "success"');
+    const p3=has('sleep');
+    const p4=has("canary_healthy == 'true'")||has('canary_healthy == "true"');
+    const p5=has("canary_healthy != 'true'")||has('canary_healthy != "true"');
+    lines.push([p1?'tok':'terr','[CHECK] workflow_run references CI pipeline: '+(p1?'OK':'FAIL'),80]);
+    lines.push([p2?'tok':'terr',"[CHECK] Checks conclusion == 'success': "+(p2?'OK':'FAIL'),80]);
+    lines.push([p3?'tok':'twarn','[CHECK] Wait/sleep step: '+(p3?'OK':'MISSING'),80]);
+    lines.push([p4?'tok':'terr','[CHECK] full_rollout if canary_healthy==true: '+(p4?'OK':'FAIL'),80]);
+    lines.push([p5?'tok':'terr','[CHECK] rollback if canary_healthy!=true: '+(p5?'OK':'FAIL'),80]);
+    if(p1&&p2&&p3&&p4&&p5){
+      lines.push(['tok','\n[SIMULATE] Running canary deployment...',200]);
+      lines.push(['ti','[DEPLOY] Canary 10% traffic - version: v-abc1234',150]);
+      lines.push(['ti','[METRICS] accuracy: 0.9142  latency: 78.3ms',100]);
+      lines.push(['tok','[METRICS] healthy: True -> PROMOTING to 100%',80]);
+    }
+  }
+  else if(f==='monitor.py'){
+    lines.push(['tcmd','$ python monitor.py',100]);
+    lines.push(['ti','MONITORING CYCLE - '+new Date().toISOString().slice(0,16)+' UTC',80]);
+    const a1=has('baseline_accuracy')&&has('/ len(predictions)');
+    const a2=has('drift_score')&&(has('ref_stds')||has('ref_std'));
+    const a3=has('max_retrains_per_day')&&has('timedelta');
+    const a4=has('triggered = True')||has('triggered=True');
+    lines.push([a1?'tok':'twarn','[ACCURACY] '+(a1?'Rolling: 0.88 | drop: 0.020 | status: warning':'check_rolling_accuracy() not implemented'),80]);
+    lines.push([a2?'tok':'twarn','[DRIFT] '+(a2?'sepal_length score=1.25 DRIFTED | petal_length score=2.63 DRIFTED':'check_feature_drift_simplified() not implemented'),80]);
+    lines.push([a3?'tok':'twarn','[CIRCUIT] '+(a3?'OK - 0 retrains today':'check_circuit_breaker() not implemented - no safety!'),80]);
+    if(a4){ lines.push(['tok','[RETRAIN] Triggered: https://github.com/myorg/ml-pipeline/actions/runs/99999',80]); lines.push(['tok','Final: YELLOW | CI/CD loop closed!',80]); }
+    else lines.push(['twarn','[RETRAIN] trigger_retraining() incomplete - set triggered=True',80]);
+  }
+  return lines;
+}
+
+// ─── VALIDATE ─────────────────────────────────────────────────
+async function validateLab(){
+  const code=userCode[cur];
+  const checks=CHECKS[cur];
+  switchRP('tests');
+  document.getElementById('statusbar').textContent='Validating...';
+  let html=`<div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px">AUTOMATED CHECKS — ${FILES[cur]}</div>`;
+  let passed=0;
+  for(const [label,pattern] of checks){
+    await sleep(100);
+    const re=new RegExp(pattern,'s');
+    const ok=re.test(code)&&!code.includes('FILL_ME_IN');
+    if(ok) passed++;
+    html+=`<div class="tr ${ok?'pass':'fail'}"><div class="tr-ic"></div><div style="color:var(--text)">${label}</div></div>`;
+    document.getElementById('testsHtml').innerHTML=html;
+  }
+  const allPass=passed===checks.length;
+  const pct=Math.round(passed/checks.length*100);
+  html+=`<div style="margin-top:10px;padding:10px;background:${allPass?'rgba(61,220,132,.06)':'rgba(255,83,112,.06)'};border:1px solid ${allPass?'rgba(61,220,132,.3)':'rgba(255,83,112,.3)'};font-family:var(--mono);font-size:11px">
+    <div style="color:${allPass?'var(--green)':'var(--red)'};font-weight:700">${allPass?'✓ ALL CHECKS PASSED':'✗ '+passed+'/'+checks.length+' PASSED ('+pct+'%)'}</div>
+    <div style="color:var(--muted);margin-top:4px">${allPass?'Lab complete. Next lab is now unlocked.':'Fix failing checks and validate again.'}</div>
+  </div>`;
+  document.getElementById('testsHtml').innerHTML=html;
+  document.getElementById('statusbar').textContent=FILES[cur]+' — '+(allPass?'Validated ✓':passed+'/'+checks.length+' checks');
+
+  if(allPass&&!labDone[cur]){
+    labDone[cur]=true;
+    totalPts+=PTS[cur];
+    if(cur+1<6){ labUnlocked[cur+1]=true; const fi=document.getElementById('fi-'+(cur+1)); fi.classList.remove('locked'); fi.querySelector('.fi-badge').className='fi-badge todo'; fi.querySelector('.fi-badge').textContent='TODO'; }
+    document.getElementById('fi-'+cur).querySelector('.fi-badge').className='fi-badge done';
+    document.getElementById('fi-'+cur).querySelector('.fi-badge').textContent='DONE';
+    renderLabNav();
+    renderMission();
+    updateScore();
+    clearTerm();
+    tprint('tok','✓ VALIDATION PASSED - all checks green');
+    tprint('tok','+ '+PTS[cur]+' points earned | Total: '+totalPts+' pts');
+    if(cur+1<6) tprint('ti','Next lab unlocked: '+FILES[cur+1]);
+    else tprint('tok','🎖  ALL 6 LABS COMPLETE - Full CI/CD pipeline built!');
+  }
+}
+
+// ─── HINTS ────────────────────────────────────────────────────
+function showNextHint(){
+  const hints=HINTS[cur];
+  if(!hints||hints.length===0){
+    document.getElementById('hintsHtml').innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--muted)">No hints for this lab. Check the DOCS tab.</div>';
+    switchRP('hints');
+    return;
+  }
+  if(hintIdx[cur]<hints.length) hintIdx[cur]++;
+  renderHints();
+  switchRP('hints');
+}
+
+function renderHints(){
+  const hints=HINTS[cur];
+  if(!hints||hints.length===0||hintIdx[cur]===0){
+    document.getElementById('hintsHtml').innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--muted)">Click 💡 HINT to reveal hints one at a time.</div>';
+    return;
+  }
+  const revealed=hints.slice(0,hintIdx[cur]);
+  let html=`<div style="font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">💡 HINTS — ${hintIdx[cur]}/${hints.length} revealed</div>`;
+  revealed.forEach((h,i)=>{
+    html+=`<div class="hint-box">
+      <div class="hint-label">HINT ${i+1}: ${h.label}</div>
+      <div class="code-block">${escHtml(h.code)}</div>
+    </div>`;
+  });
+  if(hintIdx[cur]<hints.length){
+    html+=`<div style="font-family:var(--mono);font-size:10px;color:var(--amber);cursor:pointer;margin-top:4px" onclick="showNextHint()">→ Click HINT for next (${hints.length-hintIdx[cur]} remaining)</div>`;
+  } else {
+    html+=`<div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px">All hints revealed. Check DOCS for full API reference.</div>`;
+  }
+  document.getElementById('hintsHtml').innerHTML=html;
+}
+
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ─── MISSION ──────────────────────────────────────────────────
+function renderMission(){
+  const done=labDone.filter(Boolean).length;
+  const pct=Math.round(done/6*100);
+  const ls=labDone[cur];
+  let html=`
+    <div class="pbar"><div class="pfill" style="width:${pct}%"></div></div>
+    <div class="pts-row">Total: ${totalPts} pts</div>
+    ${ls?`<div class="done-banner show"><h4>✓ LAB COMPLETE</h4><p>+${PTS[cur]} points. ${cur<5?FILES[cur+1]+' is now unlocked.':'All labs done!'}</p></div>`:''}
+    <div class="m-tag">// LAB 0${cur+1} — ${PTS[cur]} PTS</div>
+    <div class="m-head">${TITLES[cur]}</div>
+    <div class="m-sub">${SUBS[cur]}</div>
+    <div class="m-desc">${DESCS[cur]}</div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">OBJECTIVES</div>
+    <div class="obj-list">`;
+  OBJS[cur].forEach((o,i)=>{
+    html+=`<div class="obj${ls?' done':''}">
+      <div class="obj-ck">${ls?'✓':''}</div>
+      <div class="obj-num">${String(i+1).padStart(2,'0')}</div>
+      <div>${o}</div>
+    </div>`;
+  });
+  html+=`</div><div style="font-family:var(--mono);font-size:10px;color:var(--cyan);border:1px solid var(--cyan2);display:inline-block;padding:4px 10px">📋 Fill all ### YOUR CODE ### sections</div>`;
+  document.getElementById('missionHtml').innerHTML=html;
+}
+
+function renderDocs(){
+  document.getElementById('docsHtml').textContent=DOCS[cur];
+}
+
+// ─── PANEL SWITCH ─────────────────────────────────────────────
+function switchRP(tab){
+  document.querySelectorAll('.rp-sec').forEach(s=>s.classList.remove('show'));
+  document.querySelectorAll('.rp-tab').forEach(t=>t.classList.remove('active'));
+  const panel=document.getElementById('rp-'+tab);
+  if(panel) panel.classList.add('show');
+  const map={mission:0,tests:1,hints:2,docs:3};
+  const tabs=document.querySelectorAll('.rp-tab');
+  if(map[tab]!==undefined&&tabs[map[tab]]) tabs[map[tab]].classList.add('active');
+}
+
+// ─── UTILS ────────────────────────────────────────────────────
+function updateScore(){
+  document.getElementById('scorePill').textContent=totalPts+' PTS';
+  document.getElementById('progPill').textContent='LAB '+(cur+1)+'/6';
+}
+
+function resetEditor(){
+  if(!confirm('Reset to starter code? Your changes will be lost.')) return;
+  userCode[cur]=CODES[cur];
+  document.getElementById('editor').value=userCode[cur];
+  updateLN();
+  hintIdx[cur]=0;
+  renderHints();
+  clearTerm();
+  tprint('twarn','↺ Reset to starter code');
+  document.getElementById('statusbar').textContent='Ready';
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+init();
+</script>
+</body>
+</html>

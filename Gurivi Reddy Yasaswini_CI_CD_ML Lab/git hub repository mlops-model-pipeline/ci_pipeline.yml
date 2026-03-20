@@ -1,0 +1,211 @@
+
+
+
+# ci_pipeline.yml - Lab 4: GitHub Actions CI for ML
+# -------------------------------------------------------
+# WHY THIS FILE IS USED
+# -------------------------------------------------------
+# This file defines the Continuous Integration (CI) pipeline
+# for the machine learning project using GitHub Actions.
+#
+# CI pipeline automatically:
+# 1. Trains the model
+# 2. Validates the model
+# 3. Stores model artifacts
+# 4. Prepares model for deployment
+#
+# This removes manual work and ensures consistency.
+
+
+
+name: ML Training CI Pipeline
+
+# -----------------------------
+# TRIGGERS
+# -----------------------------
+on:
+  push:
+    # WHY:
+    # Run pipeline only when important folders change
+    paths:
+      - 'src/**'
+      - 'configs/**'
+      - 'data/**'
+
+  schedule:
+    # WHY:
+    # Run automatically every day (retraining)
+    - cron: '0 2 * * *'
+
+  workflow_dispatch:
+    # WHY:
+    # Allows manual run from GitHub UI
+   
+
+
+# -----------------------------
+# GLOBAL ENV VARIABLES
+# -----------------------------
+env:
+  PYTHON_VERSION: '3.10'
+
+  # WHY:
+  # Using commit SHA as model version
+  MODEL_VERSION: ${{ github.sha }}
+
+
+# -----------------------------
+# JOB 1: TRAIN MODEL
+# -----------------------------
+jobs:
+
+  train:
+    name: Train Model
+    runs-on: ubuntu-latest   # GitHub runner
+
+    steps:
+
+      - name: Checkout Code
+        # WHY:
+        # Downloads repository code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        # WHY:
+        # Installs required Python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        # WHY:
+        # Install required libraries
+        run: pip install -r requirements.txt
+
+      - name: Run training
+        # WHY:
+        # Executes training script
+        run: python train.py
+        env:
+          MODEL_VERSION: ${{ env.MODEL_VERSION }}
+
+      - name: Upload model artifact
+        # WHY:
+        # Saves trained model for next job
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-${{ github.sha }}
+          path: model.pkl
+          retention-days: 30
+
+
+# -----------------------------
+# JOB 2: VALIDATE MODEL
+# -----------------------------
+  validate:
+    name: Validate Model
+    runs-on: ubuntu-latest
+
+    # WHY:
+    # Runs only after training is complete
+    needs: [train]
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download model artifact
+        # WHY:
+        # Get trained model from previous job
+        uses: actions/download-artifact@v4
+        with:
+          name: model-${{ github.sha }}
+
+      - name: Run validation gates
+        # WHY:
+        # Ensure model quality
+        run: python validate.py
+
+
+# -----------------------------
+# JOB 3: REGISTER MODEL
+# -----------------------------
+  register:
+    name: Register Model
+    runs-on: ubuntu-latest
+
+    # WHY:
+    # Runs only after validation passes
+    needs: [validate]
+
+    # WHY:
+    # Only allow deployment from main branch
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Register Model
+        # WHY:
+        # Simulates model registry step
+        run: python -c "print('Registered: iris_classifier @ Staging')"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# -------------------------------------------------------
+# REAL WORLD UNDERSTANDING
+# -------------------------------------------------------
+# In real companies:
+# - Developers push code to GitHub
+# - CI pipeline runs automatically
+#
+# Example:
+# A data scientist updates model code →
+# GitHub triggers pipeline →
+# Model retrains → gets validated →
+# If passed → ready for deployment
+#
+# Without CI:
+# - Manual errors
+# - No tracking
+# - No automation
+#
+# CI = automatic ML system execution
+
+
+
+
+
+
+
+
+
+
+

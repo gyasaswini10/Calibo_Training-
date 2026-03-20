@@ -1,0 +1,212 @@
+
+
+
+
+# cd_deploy.yml - Lab 5: Canary Deployment
+# -------------------------------------------------------
+# WHY THIS FILE IS USED
+# -------------------------------------------------------
+# This file defines the Continuous Deployment (CD) pipeline.
+#
+# After CI pipeline succeeds, this file:
+# 1. Deploys model to a small % of users (canary)
+# 2. Monitors performance
+# 3. Decides whether to:
+#    - Fully deploy OR
+#    - Rollback
+#
+# This prevents deploying bad models to all users.
+
+
+
+
+# WHY CANARY:
+# Prevents deploying bad model to all users
+# Reduces risk by testing on small % first
+
+
+
+
+name: ML Model CD - Canary Deployment
+
+# -----------------------------
+# TRIGGER
+# -----------------------------
+on:
+  workflow_run:
+    # WHY:
+    # Run only after CI pipeline completes
+    workflows: ["ML Training CI Pipeline"]
+    types: [completed]
+    branches: [main]
+
+
+jobs:
+
+# -----------------------------
+# JOB 1: CANARY DEPLOYMENT
+# -----------------------------
+  canary_deploy:
+    name: Deploy Canary (10% traffic)
+    runs-on: ubuntu-latest
+
+    # WHY:
+    # Run only if CI pipeline was successful
+    if: github.event.workflow_run.conclusion == 'success'
+
+    outputs:
+      canary_healthy: ${{ steps.health_check.outputs.healthy }}
+      model_version: ${{ steps.deploy.outputs.version }}
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - run: pip install -r requirements.txt
+
+
+      # -----------------------------
+      # STEP: DEPLOY CANARY
+      # -----------------------------
+      - name: Deploy canary at 10% traffic
+        id: deploy
+        run: |
+          python -c "
+          import os
+
+          # Simulated version
+          version = 'v-abc1234'
+
+          print('[DEPLOY] Canary 10% - version:', version)
+
+          # Save version for next jobs
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write('version=' + version + '\n')
+          "
+
+
+      # -----------------------------
+      # WAIT FOR METRICS
+      # -----------------------------
+      - name: Wait for metrics
+        run: |
+          echo 'Waiting for system metrics...'
+          sleep 10
+
+
+      # -----------------------------
+      # HEALTH CHECK
+      # -----------------------------
+      - name: Check canary health
+        id: health_check
+        run: |
+          python -c "
+          import random, os
+
+          random.seed(42)
+
+          # Simulated metrics
+          accuracy = round(random.uniform(0.87, 0.94), 4)
+          latency  = round(random.uniform(45, 110), 1)
+
+          print('[METRICS] accuracy:', accuracy)
+          print('[METRICS] latency:', latency, 'ms')
+
+          # Decision logic
+          healthy = accuracy >= 0.85 and latency <= 200
+
+          print('[STATUS] healthy:', healthy)
+
+          # Pass result to next job
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write('healthy=' + str(healthy).lower() + '\n')
+          "
+
+
+# -----------------------------
+# JOB 2: FULL ROLLOUT
+# -----------------------------
+  full_rollout:
+    name: Promote to 100% Traffic
+    runs-on: ubuntu-latest
+
+    needs: canary_deploy
+
+    # WHY:
+    # Run only if canary is healthy
+    if: needs.canary_deploy.outputs.canary_healthy == 'true'
+
+    steps:
+      - run: |
+          echo '[PROMOTE] Deploying to 100% users'
+          echo '[PROMOTE] Model moved to Production'
+
+
+# -----------------------------
+# JOB 3: ROLLBACK
+# -----------------------------
+  rollback:
+    name: Auto Rollback
+    runs-on: ubuntu-latest
+
+    needs: canary_deploy
+
+    # WHY:
+    # Run if canary fails
+    if: needs.canary_deploy.outputs.canary_healthy != 'true'
+
+    steps:
+      - run: |
+          echo '[ROLLBACK] Deployment failed'
+          echo '[ROLLBACK] Reverting to previous stable model'
+          echo '[ALERT] Team notified'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# -------------------------------------------------------
+# REAL WORLD UNDERSTANDING
+# -------------------------------------------------------
+# In real systems:
+# You NEVER deploy directly to 100% users.
+#
+# Instead:
+# Step 1: Deploy to small users (10%)
+# Step 2: Check metrics (accuracy, latency)
+# Step 3:
+#    If good → deploy to all users
+#    If bad → rollback
+#
+# Example:
+# Netflix / Amazon recommendation systems:
+# - New model tested on small group
+# - If performance drops → rollback instantly
+
+
+
+
+
+
