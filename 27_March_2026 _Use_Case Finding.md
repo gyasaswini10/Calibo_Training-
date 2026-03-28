@@ -12,8 +12,6 @@ In the future, this can be improved with better data, more advanced AI models, a
 
 
 
-![Picture1](https://github.com/user-attachments/assets/d0965b74-9b03-4d37-a14d-774c9f354076)
-
 
 
 Student Classroom Attention Detection
