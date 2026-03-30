@@ -11,6 +11,8 @@ MCP_SERVER --30-03-2026
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/f716f7b6-1350-4fb2-8b25-f0da577d22e6" />
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/640b844e-c469-4b34-ac3a-c86c6b2fabbb" />
 <img width="1705" height="790" alt="image" src="https://github.com/user-attachments/assets/9861f6f8-1c63-4e02-8520-a400fd86bb8d" />
+<img width="902" height="736" alt="image" src="https://github.com/user-attachments/assets/76a892bd-5c2d-43c3-9189-b89573d170ad" />
+
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/85ece636-e0fb-4f1c-8641-c4fa3f096fe2" />
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7804ddad-5f5e-4fbb-8969-711936f00262" />
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/13891770-2dd8-4669-96fb-5f956420d0c7" />
