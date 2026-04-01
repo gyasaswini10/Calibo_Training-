@@ -19,3 +19,11 @@ MCP_SERVER --30-03-2026
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/2adf5970-ba0b-469f-b980-8d0e50226c15" />
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/3c0c472e-6b8d-4815-9c2c-e121e41cf672" />
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7f03755b-8c80-4239-8561-e50113c666c3" />
+
+
+MCP_CLASS_ACTIVITY_FILE HANDLING
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/4c03b71c-c760-4121-afdf-bc097364c6b8" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/b43da60a-2273-4d9d-a31b-c55d5fd27288" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/ec49ad58-73f1-4263-b35e-10a0502294d7" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a8e21e99-2b66-44b2-8258-143ea1382049" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/79c6e25f-ad81-425b-8794-644b5c81a501" />
