@@ -1,0 +1,9 @@
+Go to your project folder.
+Initialize Git: git init
+Create a new branch: git checkout -b branch_name
+Add the files/folders you want: git add path/to/files
+Commit your changes: git commit -m "commit message"
+Add remote repo if not added: git remote add origin repo_url
+Push the branch: git push -u origin branch_name
+Your main branch stays untouched.
+You can now create a pull request on GitHub if needed.
